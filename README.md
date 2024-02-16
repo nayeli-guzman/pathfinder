@@ -7,17 +7,23 @@ aquí puedes poner que .h modificaste
 
 // cuando el usuario superpone el inicio sobre el fin, el programa no deja que este pueda ejecutar dijkstra hasta que el usuario ingrese un inicio y fin adecuados.
 
-screen.h:
+**screen.h:**
 
 ahora se usa la M para abrir el Menu (antes llamado informacion)
 
-menu.h:
+**nuevo:** ahora se muestra el tiempo que tomó dijkstra 
+
+**menu.h:**
 
 agregue lo de la letra C en la ventana de ayuda
 
+**nuevo:** con lo del tiempo tuve que agregar más texto a la parte de dynamic text
 
+**grid.h**
 
-Observaciones/Falta:
+con lo del tiempo se modificó un poco el alg de dijkstra y se agregó un getter para obtener el tiempo
+
+**Observaciones/Falta:**
 
 Cuando el usuario presiona el inicio o final sobre una wall y luego lo cambia a otro lugar, este lo vuelve un Empty, en vez de una Wall (Yo lo corrijo solo lo hago para acordarme).
 
@@ -28,3 +34,5 @@ BFS
 Modificar el mapa para que se hagan mas caminos (o menos)?
 
 Poder cambiar el size del  mapa
+
+- Hacer la tabla de tiemposs (más adelante lo haré, cuando estén los demás alg,:)
