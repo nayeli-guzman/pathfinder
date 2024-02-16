@@ -21,23 +21,23 @@ private:
 	bool selected_alg = false;
 public:
 
-	Screen() {}
+	Screen(){}
 
 	void execute() {
 
 		window.create({ NODE_SIZE * COLS
 						, NODE_SIZE * ROWS + HEADER_HEIGHT }
-		, "Project");
+					, "Project");
 
 		window.setFramerateLimit(60);
 
 		Grid grid(ROWS, COLS, window);
 
 		Menu menu(HEADER_HEIGHT
-			, NODE_SIZE * COLS
-			, NODE_SIZE * ROWS
-			, window
-		);
+					, NODE_SIZE * COLS
+					, NODE_SIZE * ROWS
+					, window
+			);
 
 
 		while (window.isOpen()) {
@@ -63,12 +63,14 @@ public:
 						if (event.mouseButton.button == Mouse::Left) {
 
 							if (selected_alg) grid.partial_clean(); // no se limpia inicio ni fin
+							
 							if (grid.getEnd() == current_pos)
 								grid.clearEnd(); // sus valores se ponen a -1,-1
+							
 							grid.setBegin(current_pos);
-						}
-						else if (event.mouseButton.button == Mouse::Right) {
 
+						} else if (event.mouseButton.button == Mouse::Right) {
+							
 							if (selected_alg) grid.partial_clean();
 							if (grid.getBegin() == current_pos)
 								grid.clearBegin();
@@ -89,60 +91,62 @@ public:
 						}
 
 						if (event.key.code >= Keyboard::Num1 && event.key.code <= Keyboard::Num3) {
-
+							
 							if (grid.isBegin() == false || grid.isEnd() == false) {
-								menu.changeDynamicText(1); // 1: No begin or end
+								menu.changeDynamicText(1, 0); // 1: No begin or end
 							}
-
+							
 							else {
 
 								if (event.key.code == Keyboard::Num1) {
 									menu.updateSelector(1);
-									menu.changeDynamicText(2); // 2. executing dijkstra
+									menu.changeDynamicText(2, 0); // 2. executing dijkstra
 									grid.setAlgorithm(1);
 								}
 								else if (event.key.code == Keyboard::Num2) {
 									menu.updateSelector(2);
-									menu.changeDynamicText(3); // 3. executing dfs
+									menu.changeDynamicText(3, 0); // 3. executing dfs
 									grid.setAlgorithm(2);
 								}
 								else if (event.key.code == Keyboard::Num3) {
 									menu.updateSelector(3);
-									menu.changeDynamicText(4); // 4. executing bfs
+									menu.changeDynamicText(4, 0); // 4. executing bfs
 									grid.setAlgorithm(3);
 								}
-
+							
 							}
 
 						}
-
+						
 						// Ahora falta que el usuario no pueda settear el inicio o
 						// fin en una pared
 						if (event.key.code == Keyboard::Space) {
-
+							
 							if (grid.getAlgorithm() != 0 && (grid.isBegin() == true && grid.isEnd() == true)) {
-
+								
 								switch (grid.getAlgorithm()) {
 								case 1: // DIJKSTRA
 									// cuando ya se ejecutó y se muestra en pantalla
 									grid.dijkstra();
+									menu.changeDynamicText(5, grid.getTime());
 									selected_alg = true;
 									break;
 								case 2: // DFS
 									// falta
+									menu.changeDynamicText(6, grid.getTime());
 									selected_alg = true;
 									break;
 								case 3: // BFS
 									// falta
+									menu.changeDynamicText(7, grid.getTime());
 									selected_alg = true;
 									break;
 								default:
 									break;
 								}
-
-							}
-							else menu.changeDynamicText(1);
-
+							
+							} else menu.changeDynamicText(1,0);
+							
 						}
 
 					}
@@ -154,7 +158,7 @@ public:
 			grid.draw();
 			menu.draw();
 
-		}
+		}	
 
 	}
 
@@ -162,7 +166,7 @@ public:
 	Tuple getTuple() {
 
 		Vector2i mouse = Mouse::getPosition(window);
-
+		
 		int x = mouse.x / NODE_SIZE;
 		int y = mouse.y / NODE_SIZE - (HEADER_HEIGHT / NODE_SIZE);
 
@@ -171,4 +175,4 @@ public:
 	}
 
 };
-	
+
