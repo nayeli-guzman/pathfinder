@@ -16,16 +16,17 @@ private:
 	Font font_1, font_2, font_3;
 	Text text_1, text_2, text_3, text_4, text_5, text_6, text_7, text_8;
 	string t1 = "Bienvenido"
-		, t2 = "Presione 'M' para abrir el Menu"
-		, t3 = "   Menu"
+		, t2 = "Presione 'M' para abrir el menu"
+		, t3 = "Informacion"
 		, t4 = "Presione las siguientes teclas de acuerdo al \n\n          algoritmo que quiera ejecutar"
 		, t5 = ". . .  seleccione un algoritmo  . . ." // dynamic text
-		, t6 = "Para ejecutar el algoritmo seleccionado, usted"
-		"\n\n          debe presionar 'ESPACIO'."
-		"\n\n\n\nAntes de esto el inicio y fin deben definirse"
+		, t6 = "Para ejecutar el algoritmo seleccionado, usted" 
+				"\n\n          debe presionar 'ESPACIO'."
+				"\n\n\n\nAntes de esto el inicio y fin deben definirse"
 		, t7 = "[click] \t Inicio"
-		"\n\n[anticlick]\t Fin"
-		, t8 = "Para reiniciar el mapa y ejecutar otro algoritmo, \n\n	debe presionar 'C' y repetir el proceso\n\n				 de seleccion"
+				"\n\n[anticlick]\t Fin"
+		, t8 = "Para reiniciar el mapa y ejecutar otro algoritmo, "
+				"\n\n	debe presionar 'C' y repetir el proceso\n\n				 de seleccion"
 		;
 	vector<string> help_alg{ "[1]\t Dijkstra", "[2]\t BFS", "[3]\t DFS" };
 	vector<Text> help_txt;
@@ -34,7 +35,7 @@ private:
 	vector<string> algorithms{ "Dijkstra", "DFS", "BFS" };
 	bool help_w = false;
 
-
+	
 
 public:
 
@@ -114,7 +115,7 @@ public:
 		text_5.setCharacterSize(23);
 		text_5.setPosition(width / 2 + 2 * NODE_SIZE, NODE_SIZE * 1.5);
 
-
+		
 
 	}
 
@@ -124,12 +125,12 @@ public:
 		text_3.setFont(font_1);
 		text_3.setString(t3);
 		text_3.setCharacterSize(30);
-		text_3.setPosition(width / 2 - 3.25 * NODE_SIZE, 150 + 1 * NODE_SIZE);
+		text_3.setPosition(width / 2 - 3.25 * NODE_SIZE, 150 + 1.5 * NODE_SIZE);
 
 		text_4.setFont(font_2);
 		text_4.setString(t4);
 		text_4.setCharacterSize(15);
-		text_4.setPosition(width / 2 - 8.5 * NODE_SIZE, 150 + 2.5 * NODE_SIZE);
+		text_4.setPosition(width / 2 - 8.5 * NODE_SIZE, 150 + 3 * NODE_SIZE);
 
 		help_txt.resize(3);
 
@@ -137,40 +138,50 @@ public:
 			help_txt[i].setFont(font_2);
 			help_txt[i].setString(help_alg[i]);
 			help_txt[i].setCharacterSize(15);
-			help_txt[i].setPosition(width / 2 - 3 * NODE_SIZE, 150 + (4.5 + j) * NODE_SIZE);
+			help_txt[i].setPosition(width / 2 - 3 * NODE_SIZE, 150 + (5 + j) * NODE_SIZE);
 		}
 
 		text_6.setFont(font_2);
 		text_6.setString(t6);
 		text_6.setCharacterSize(15);
-		text_6.setPosition(width / 2 - 8.75 * NODE_SIZE, 150 + 7.8 * NODE_SIZE);
+		text_6.setPosition(width / 2 - 8.75 * NODE_SIZE, 150 + 8.5 * NODE_SIZE);
 
 		text_7.setFont(font_2);
 		text_7.setString(t7);
 		text_7.setCharacterSize(15);
-		text_7.setPosition(width / 2 - 4.5 * NODE_SIZE, 150 + 10.9 * NODE_SIZE);
+		text_7.setPosition(width / 2 - 4.5 * NODE_SIZE, 150 + 11 * NODE_SIZE);
 
 		text_8.setFont(font_2);
 		text_8.setString(t8);
 		text_8.setCharacterSize(15);
 		text_8.setPosition(width / 2 - 8.75 * NODE_SIZE, 150 + 12.7 * NODE_SIZE);
+
 	}
 
-	void changeDynamicText(int index) {
+	void changeDynamicText(int index, double t) {
 
-		switch (index) {
-		case 1:
-			t5 = "seleccione un inicio y/o fin";
-			break;
-		case 2:
-			t5 = "ejecutando Dijkstra";
-			break;
-		case 3:
-			t5 = "ejecutando DFS";
-			break;
-		case 4:
-			t5 = "ejecutando BFS";
-			break;
+		switch (index){
+			case 1:
+				t5 = "seleccione un inicio y/o fin";
+				break;
+			case 2:
+				t5 = "ejecutando Dijkstra";
+				break;
+			case 3:
+				t5 = "ejecutando DFS";
+				break;
+			case 4:
+				t5 = "ejecutando BFS";
+				break;
+			case 5:
+				t5 = "Dijkstra tomó " + to_string(t) + " ms";
+				break;
+			case 6:
+				t5 = "DFS tomó " + to_string(t) + " ms";
+				break;
+			case 7:
+				t5 = "BFS tomó " + to_string(t) + " ms";
+				break;
 		default:
 			break;
 		}
@@ -224,5 +235,7 @@ public:
 		window.display();
 
 	}
+
+
 };
 
