@@ -21,6 +21,7 @@ con lo del tiempo se modificó un poco el alg de dijkstra y se agregó un getter
 
 ya no se puede colocar ni el inicio ni el final en una pared
 
+
 **Observaciones/Falta:**
 
 DFS
