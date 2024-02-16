@@ -15,14 +15,14 @@ class Grid {
 private:
 
 	int rows, cols;
-	RenderWindow &window;
+	RenderWindow& window;
 	Node** grid;
 	Tuple start_tuple, end_tuple;
 	bool start = false, end = false;
 
 	int a = 0;
 	double time;
-	
+
 
 	// dijkstra
 	queue<Node> queued_nodes;
@@ -36,14 +36,14 @@ private:
 public:
 
 	Grid(int r, int c, RenderWindow& w) : rows(r), cols(c), window(w) { // 17, 40
-		
+
 		grid = new Node * [cols];
 
 		for (int x = 0; x < cols; x++) {
-			grid[x] = new Node [rows];
+			grid[x] = new Node[rows];
 			for (int y = 0; y < rows; y++)
 				grid[x][y] = Node(Tuple(x, y), 'E'); // E empty
-		
+
 		}
 
 		generateMazeDFS();
@@ -77,19 +77,23 @@ public:
 	}
 
 	void setBegin(Tuple t) {
-		if (start) setEmpty(start_tuple);
-		grid[t.x][t.y].animation(t, 'B');
-		grid[t.x][t.y].setIsStart(true);
-		start_tuple = t;
-		start = true;
+		if (grid[t.x][t.y].getType() != 'W') {
+			if (start) setEmpty(start_tuple);
+			grid[t.x][t.y].animation(t, 'B');
+			grid[t.x][t.y].setIsStart(true);
+			start_tuple = t;
+			start = true;
+		}
 	}
 
 	void setEnd(Tuple t) {
-		if (end) setEmpty(end_tuple);
-		grid[t.x][t.y].animation(t, 'T');
-		grid[t.x][t.y].setIsEnd(true);
-		end_tuple = t;
-		end = true;
+		if (grid[t.x][t.y].getType() != 'W') {
+			if (end) setEmpty(end_tuple);
+			grid[t.x][t.y].animation(t, 'T');
+			grid[t.x][t.y].setIsEnd(true);
+			end_tuple = t;
+			end = true;
+		}
 	}
 
 	void setEmpty(Tuple t) {
@@ -109,7 +113,7 @@ public:
 	Tuple getEnd() {
 		return end_tuple;
 	}
-	
+
 	bool isBegin() {
 		return start;
 	}
@@ -117,7 +121,7 @@ public:
 	bool isEnd() {
 		return end;
 	}
-	
+
 	int getAlgorithm() {
 		return a; // 1. Dijkstra   2. DFS   3.BFS
 	}
@@ -130,11 +134,11 @@ public:
 
 	void total_clean() {
 
-		for (int x=0; x<cols; x++) 
-			for (int y = 0; y < rows; y++) 
+		for (int x = 0; x < cols; x++)
+			for (int y = 0; y < rows; y++)
 				if (grid[x][y].getType() != 'W')
 					grid[x][y].total_clean();
-			
+
 		while (!queued_nodes.empty()) queued_nodes.pop();
 	}
 
@@ -159,10 +163,10 @@ public:
 
 		auto t_begin = high_resolution_clock::now();
 
-		
+
 		set_neighbors();
 
-		bool searching =  true;
+		bool searching = true;
 
 		grid[start_tuple.x][start_tuple.y].setStart(true);
 		grid[start_tuple.x][start_tuple.y].setQueued(true);
@@ -175,19 +179,19 @@ public:
 			queued_nodes.front().setVisited(true);
 			queued_nodes.pop();
 
-			if (temp == end_tuple) {  
+			if (temp == end_tuple) {
 
 				grid[end_tuple.x][end_tuple.y].setType('T');
 				searching = false;
 				Tuple p = grid[temp.x][temp.y].getPrior();
-				
+
 				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
 					path.push_back(grid[p.x][p.y]);
 					grid[p.x][p.y].setType('P');
 					p = grid[p.x][p.y].getPrior();
 
 				}
-				
+
 			}
 			else {
 
@@ -218,7 +222,7 @@ public:
 		for (int x = 0; x < cols; x++)
 			for (int y = 0; y < rows; y++)
 				grid[x][y].set_n(grid);
-			
+
 
 	}
 
@@ -276,6 +280,6 @@ public:
 
 		return neighbors;
 	}
-	
+
 
 };
