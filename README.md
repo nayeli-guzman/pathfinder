@@ -27,3 +27,4 @@ BFS
 
 Modificar el mapa para que se hagan mas caminos (o menos)?
 
+Poder cambiar el size del  mapa
