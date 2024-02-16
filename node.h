@@ -34,12 +34,17 @@ private:
 	Tuple tuple;
 	int x, y;
 
+	bool is_start = false, is_end = false;
+
 	vector<Tuple> v_n;
 	bool visited = false, queued = false, start = false;
 	Tuple prior;
+	bool dijkstra = false;
 
 public:
+
 	Node(){}
+
 	Node(Tuple t, char _t) {
 
 		tuple = t;
@@ -102,29 +107,59 @@ public:
 		
 	}
 
+	void draw(RenderWindow& w) {
+		filterImages();
+		w.draw(*square);
+	}
+
+	// dijkstra
+
 	void set_n(Node** grid) {
 
+		dijkstra = true;
 		v_n.resize(0);
 
 		if (type != 'W') {
 
-			if (x > 0 && grid[x-1][y].type != 'W') v_n.push_back(Tuple(x - 1, y));
+			if (x > 0 && grid[x - 1][y].type != 'W') v_n.push_back(Tuple(x - 1, y));
 			if (x < (COLS - 1) && grid[x + 1][y].type != 'W') v_n.push_back(Tuple(x + 1, y));
 
 			if (y > 0 && grid[x][y - 1].type != 'W') v_n.push_back(Tuple(x, y - 1));
 			if (y < (ROWS - 1) && grid[x][y + 1].type != 'W') v_n.push_back(Tuple(x, y + 1));
-		
+
 		}
 
 	}
 
-	Tuple getTuple() {
-		return tuple;
+	void total_clean() {
+		if (dijkstra) {
+			dijkstra = false;
+			queued = false;
+			visited = false;
+			Tuple prior;
+			v_n.clear();
+			type = 'E';
+		}
 	}
 
-	vector<Tuple> getNeighbours() {
-		return v_n;
+	void partial_clean() {
+		if (dijkstra) {
+			dijkstra = false;
+			queued = false;
+			visited = false;
+			Tuple prior;
+			v_n.clear();
+			if (is_start || is_end)
+				return ;
+			
+			else {
+				
+				type = 'E';
+			}
+		}
 	}
+
+	// setters
 
 	void setStart(bool c) {
 		start = c;
@@ -146,6 +181,16 @@ public:
 		prior = c;
 	}
 
+	void setIsStart(bool c) {
+		is_start = c;
+	}
+
+	void setIsEnd(bool c) {
+		is_end = c;
+	}
+
+	// getters
+
 	bool getQueued() {
 		return queued;
 	}
@@ -158,9 +203,12 @@ public:
 		return prior;
 	}
 
-	void draw(RenderWindow &w) {
-		filterImages();
-		w.draw(*square);
+	Tuple getTuple() {
+		return tuple;
+	}
+
+	vector<Tuple> getNeighbours() {
+		return v_n;
 	}
 
 };
