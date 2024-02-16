@@ -18,10 +18,10 @@ class Screen {
 private:
 	RenderWindow window;
 	bool help_window = false;
+	bool selected_alg = false;
 public:
 
 	Screen(){}
-
 
 	void execute() {
 
@@ -41,6 +41,7 @@ public:
 
 
 		while (window.isOpen()) {
+
 			window.clear(Color::White);
 			for (auto event = Event{}; window.pollEvent(event); ) {
 				if (event.type == Event::Closed)
@@ -52,6 +53,7 @@ public:
 						menu.activate_help_window(help_window);
 					}
 				}
+
 				else {
 
 					if (event.type == Event::MouseButtonPressed) {
@@ -59,10 +61,14 @@ public:
 						Tuple current_pos = getTuple(); // x -> [0,39]  y -> [0,16]
 
 						if (event.mouseButton.button == Mouse::Left) {
+
+							if (selected_alg) grid.partial_clean(); // no se limpia inicio ni fin
 							if (grid.getEnd() == current_pos)
-								grid.clearEnd();
+								grid.clearEnd(); // sus valores se ponen a -1,-1
 							grid.setBegin(current_pos);
 						} else if (event.mouseButton.button == Mouse::Right) {
+							
+							if (selected_alg) grid.partial_clean();
 							if (grid.getBegin() == current_pos)
 								grid.clearBegin();
 							grid.setEnd(current_pos);
@@ -71,15 +77,24 @@ public:
 					}
 
 					if (event.type == Event::KeyPressed) {
+
 						if (event.key.code == Keyboard::H) {
 							help_window = true;
 							menu.activate_help_window(help_window);
 						}
+
+						if (event.key.code == Keyboard::C) {
+							grid.total_clean(); // comienzo y fin se borran
+						}
+
 						if (event.key.code >= Keyboard::Num1 && event.key.code <= Keyboard::Num3) {
+							
 							if (grid.isBegin() == false || grid.isEnd() == false) {
 								menu.changeDynamicText(1); // 1: No begin or end
 							}
+							
 							else {
+
 								if (event.key.code == Keyboard::Num1) {
 									menu.updateSelector(1);
 									menu.changeDynamicText(2); // 2. executing dijkstra
@@ -95,34 +110,48 @@ public:
 									menu.changeDynamicText(4); // 4. executing bfs
 									grid.setAlgorithm(3);
 								}
+							
 							}
+
 						}
-						// falta filtrar cuando después de elegir un alg, 
-						// el usuario superpone inicio y fin (justo antes de dar
-						// espacio)
+						
+						// Ahora falta que el usuario no pueda settear el inicio o
+						// fin en una pared
 						if (event.key.code == Keyboard::Space) {
-							if (grid.getAlgorithm() != 0) {
+							
+							if (grid.getAlgorithm() != 0 && (grid.isBegin() == true && grid.isEnd() == true)) {
+								
 								switch (grid.getAlgorithm()) {
 								case 1: // DIJKSTRA
+									// cuando ya se ejecutÃ³ y se muestra en pantalla
 									grid.dijkstra();
+									selected_alg = true;
 									break;
 								case 2: // DFS
 									// falta
+									selected_alg = true;
 									break;
 								case 3: // BFS
 									// falta
+									selected_alg = true;
 									break;
 								default:
 									break;
 								}
-							}
+							
+							} else menu.changeDynamicText(1);
+							
 						}
+
 					}
+
 				}
+
 			}
 
 			grid.draw();
 			menu.draw();
+
 		}	
 
 	}
@@ -138,9 +167,6 @@ public:
 		return Tuple(x, y);
 
 	}
-
-
-
 
 };
 
