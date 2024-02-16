@@ -15,6 +15,8 @@ menu.h:
 
 agregue lo de la letra C en la ventana de ayuda
 
+
+
 Observaciones/Falta:
 
 Cuando el usuario presiona el inicio o final sobre una wall y luego lo cambia a otro lugar, este lo vuelve un Empty, en vez de una Wall (Yo lo corrijo solo lo hago para acordarme).
