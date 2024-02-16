@@ -25,8 +25,6 @@ con lo del tiempo se modificó un poco el alg de dijkstra y se agregó un getter
 
 **Observaciones/Falta:**
 
-Cuando el usuario presiona el inicio o final sobre una wall y luego lo cambia a otro lugar, este lo vuelve un Empty, en vez de una Wall (Yo lo corrijo solo lo hago para acordarme).
-
 DFS
 
 BFS
