@@ -18,10 +18,10 @@ private:
 	Tuple start_tuple, end_tuple;
 	bool start = false, end = false;
 
-	int a=0;
+	int a = 0;
 
 	// dijkstra
-	queue<Node> queued_nodes, neighbours_nodes;
+	queue<Node> queued_nodes;
 	vector<Node> path;
 	bool q = false, v = false, is_dijkstra = false, target_node = false;
 
@@ -71,6 +71,7 @@ public:
 	void setBegin(Tuple t) {
 		if (start) setEmpty(start_tuple);
 		grid[t.x][t.y].animation(t, 'B');
+		grid[t.x][t.y].setIsStart(true);
 		start_tuple = t;
 		start = true;
 	}
@@ -78,6 +79,7 @@ public:
 	void setEnd(Tuple t) {
 		if (end) setEmpty(end_tuple);
 		grid[t.x][t.y].animation(t, 'T');
+		grid[t.x][t.y].setIsEnd(true);
 		end_tuple = t;
 		end = true;
 	}
@@ -111,7 +113,28 @@ public:
 	int getAlgorithm() {
 		return a; // 1. Dijkstra   2. DFS   3.BFS
 	}
-	
+
+	// limpieza
+
+	void total_clean() {
+
+		for (int x=0; x<cols; x++) 
+			for (int y = 0; y < rows; y++) 
+				if (grid[x][y].getType() != 'W')
+					grid[x][y].total_clean();
+			
+		while (!queued_nodes.empty()) queued_nodes.pop();
+	}
+
+	void partial_clean() {
+
+		for (int x = 0; x < cols; x++)
+			for (int y = 0; y < rows; y++)
+				if (grid[x][y].getType() != 'W')
+					grid[x][y].partial_clean();
+
+		while (!queued_nodes.empty()) queued_nodes.pop();
+	}
 
 	// - - - - -  algorithms  - - - - -
 
@@ -124,12 +147,9 @@ public:
 
 		bool searching =  true;
 
-		// missing: for this a start and end MUST be defined before
-
 		grid[start_tuple.x][start_tuple.y].setStart(true);
 		grid[start_tuple.x][start_tuple.y].setQueued(true);
 
-		// the first node in visited_nodes is the start node
 		queued_nodes.push(grid[start_tuple.x][start_tuple.y]);
 
 		while (!queued_nodes.empty() && searching) {
@@ -139,13 +159,12 @@ public:
 			queued_nodes.pop();
 
 			if (temp == end_tuple) {  
-				
+
+				grid[end_tuple.x][end_tuple.y].setType('T');
 				searching = false;
-				Tuple p = grid[temp.x][temp.y].getPrior(); // coords of prior of each node
-				cout << p.x << ", " << p.y << endl;
+				Tuple p = grid[temp.x][temp.y].getPrior();
 				
 				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
-					cout << p.x << ", " << p.y << endl;
 					path.push_back(grid[p.x][p.y]);
 					grid[p.x][p.y].setType('P');
 					p = grid[p.x][p.y].getPrior();
@@ -164,7 +183,7 @@ public:
 					}
 				}
 			}
-			// missing: when there's no sol
+			// falta cuando no hay soluci贸n
 		}
 
 
@@ -181,7 +200,7 @@ public:
 
 
 	void generateMazeDFS() {
-		// Elegir una posici髇 de inicio aleatoria
+		// Elegir una posici贸n de inicio aleatoria
 		int startX = rand() % cols;
 		int startY = rand() % rows;
 
@@ -213,12 +232,12 @@ public:
 
 				// Agregar el vecino a la pila
 				stack.push(neighbor);
-				stack.push(current); // Agregar el nodo actual nuevamente a la pila para continuar con su exploraci髇
+				stack.push(current); // Agregar el nodo actual nuevamente a la pila para continuar con su exploraci贸n
 			}
 		}
 	}
 
-	// Funci髇 para obtener los vecinos no visitados de un nodo
+	// Funci贸n para obtener los vecinos no visitados de un nodo
 	vector<Node*> getUnvisitedNeighbors(Node* current) {
 		vector<Node*> neighbors;
 		Tuple pos = current->getTuple();
