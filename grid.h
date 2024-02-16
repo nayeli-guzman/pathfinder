@@ -3,9 +3,11 @@
 #include <iostream>
 #include <queue>
 #include <stack>
+#include <chrono>
 #include "node.h"
 
 using namespace std;
+using namespace chrono;
 using namespace sf;
 
 class Grid {
@@ -19,11 +21,17 @@ private:
 	bool start = false, end = false;
 
 	int a = 0;
+	double time;
+	
 
 	// dijkstra
 	queue<Node> queued_nodes;
 	vector<Node> path;
 	bool q = false, v = false, is_dijkstra = false, target_node = false;
+
+	// dfs
+
+	// bfs
 
 public:
 
@@ -114,6 +122,10 @@ public:
 		return a; // 1. Dijkstra   2. DFS   3.BFS
 	}
 
+	double getTime() {
+		return time;
+	}
+
 	// limpieza
 
 	void total_clean() {
@@ -141,6 +153,11 @@ public:
 	// dijkstra
 
 	void dijkstra() {
+
+		// tiempos
+//		chrono::time_point<chrono::system_clock> t_inicio, t_fin;
+
+		auto t_begin = high_resolution_clock::now();
 
 		
 		set_neighbors();
@@ -187,7 +204,14 @@ public:
 		}
 
 
+		auto t_end = high_resolution_clock::now();
+
+		duration<double, milli> t = t_end - t_begin;
+
+		time = t.count();
+
 	}
+
 
 	void set_neighbors() {
 
