@@ -21,23 +21,23 @@ private:
 	bool selected_alg = false;
 public:
 
-	Screen(){}
+	Screen() {}
 
 	void execute() {
 
 		window.create({ NODE_SIZE * COLS
 						, NODE_SIZE * ROWS + HEADER_HEIGHT }
-					, "Project");
+		, "Project");
 
 		window.setFramerateLimit(60);
 
 		Grid grid(ROWS, COLS, window);
 
 		Menu menu(HEADER_HEIGHT
-					, NODE_SIZE * COLS
-					, NODE_SIZE * ROWS
-					, window
-			);
+			, NODE_SIZE * COLS
+			, NODE_SIZE * ROWS
+			, window
+		);
 
 
 		while (window.isOpen()) {
@@ -66,8 +66,9 @@ public:
 							if (grid.getEnd() == current_pos)
 								grid.clearEnd(); // sus valores se ponen a -1,-1
 							grid.setBegin(current_pos);
-						} else if (event.mouseButton.button == Mouse::Right) {
-							
+						}
+						else if (event.mouseButton.button == Mouse::Right) {
+
 							if (selected_alg) grid.partial_clean();
 							if (grid.getBegin() == current_pos)
 								grid.clearBegin();
@@ -78,7 +79,7 @@ public:
 
 					if (event.type == Event::KeyPressed) {
 
-						if (event.key.code == Keyboard::H) {
+						if (event.key.code == Keyboard::M) {
 							help_window = true;
 							menu.activate_help_window(help_window);
 						}
@@ -88,11 +89,11 @@ public:
 						}
 
 						if (event.key.code >= Keyboard::Num1 && event.key.code <= Keyboard::Num3) {
-							
+
 							if (grid.isBegin() == false || grid.isEnd() == false) {
 								menu.changeDynamicText(1); // 1: No begin or end
 							}
-							
+
 							else {
 
 								if (event.key.code == Keyboard::Num1) {
@@ -110,17 +111,17 @@ public:
 									menu.changeDynamicText(4); // 4. executing bfs
 									grid.setAlgorithm(3);
 								}
-							
+
 							}
 
 						}
-						
+
 						// Ahora falta que el usuario no pueda settear el inicio o
 						// fin en una pared
 						if (event.key.code == Keyboard::Space) {
-							
+
 							if (grid.getAlgorithm() != 0 && (grid.isBegin() == true && grid.isEnd() == true)) {
-								
+
 								switch (grid.getAlgorithm()) {
 								case 1: // DIJKSTRA
 									// cuando ya se ejecutó y se muestra en pantalla
@@ -138,9 +139,10 @@ public:
 								default:
 									break;
 								}
-							
-							} else menu.changeDynamicText(1);
-							
+
+							}
+							else menu.changeDynamicText(1);
+
 						}
 
 					}
@@ -152,7 +154,7 @@ public:
 			grid.draw();
 			menu.draw();
 
-		}	
+		}
 
 	}
 
@@ -160,7 +162,7 @@ public:
 	Tuple getTuple() {
 
 		Vector2i mouse = Mouse::getPosition(window);
-		
+
 		int x = mouse.x / NODE_SIZE;
 		int y = mouse.y / NODE_SIZE - (HEADER_HEIGHT / NODE_SIZE);
 
@@ -169,4 +171,4 @@ public:
 	}
 
 };
-
+	
