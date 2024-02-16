@@ -19,6 +19,8 @@ aquí puedes poner que .h modificaste
 
 con lo del tiempo se modificó un poco el alg de dijkstra y se agregó un getter para obtener el tiempo
 
+ya no se puede colocar ni el inicio ni el final en una pared
+
 **Observaciones/Falta:**
 
 DFS
