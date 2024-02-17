@@ -4,7 +4,7 @@
 
 - arreglé lo que te comenté.
   
-- cuando el usuario presiona más de una vez espacio una vez ejecutado dijktra, ya no se pinta todo de azul
+- cuando el usuario presiona más de una vez espacio una vez ejecutado dijkstra, ya no se pinta todo de azul
 
 **menu.h:**
 
