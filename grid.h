@@ -17,17 +17,21 @@ private:
 	int rows, cols;
 	RenderWindow& window;
 	Node** grid;
-	Tuple start_tuple, end_tuple;
+	Tuple start_tuple, end_tuple ;
 	bool start = false, end = false;
 
-	int a = 0;
+	int number_of_algorithm = 0;
 	double time;
 
 
 	// dijkstra
 	queue<Node> queued_nodes;
-	vector<Node> path;
-	bool q = false, v = false, is_dijkstra = false, target_node = false;
+	//vector<Node> path;
+	bool q = false
+		, v = false
+		, is_dijkstra = false
+		, target_node = false
+	;
 
 	// dfs
 
@@ -56,19 +60,7 @@ public:
 				grid[x][y].draw(window);
 	}
 
-	void clearBegin() {
-		grid[start_tuple.x][start_tuple.y].animation(start_tuple, 'E');
-		start_tuple.x = -1;
-		start_tuple.y = -1;
-		start = false;
-	}
 
-	void clearEnd() {
-		grid[end_tuple.x][end_tuple.y].animation(end_tuple, 'E');
-		end_tuple.x = -1;
-		end_tuple.y = -1;
-		end = false;
-	}
 
 	// setters
 
@@ -77,18 +69,29 @@ public:
 	}
 
 	void setBegin(Tuple t) {
+
 		if (grid[t.x][t.y].getType() != 'W') {
-			if (start) setEmpty(start_tuple);
+
+			if (start) { // si ya hay un start, se borrará el anterior
+				setEmpty(start_tuple);
+				grid[start_tuple.x][start_tuple.y].setIsStart(false); // el anterior ya no será reconocido como start point
+			}
 			grid[t.x][t.y].animation(t, 'B');
-			grid[t.x][t.y].setIsStart(true);
+			grid[t.x][t.y].setIsStart(true); // ese nodo está setteado como true
 			start_tuple = t;
-			start = true;
+			start = true; // ahora sí hay un start
 		}
+		
 	}
 
 	void setEnd(Tuple t) {
+
 		if (grid[t.x][t.y].getType() != 'W') {
-			if (end) setEmpty(end_tuple);
+			if (end) {
+				setEmpty(end_tuple);
+				grid[end_tuple.x][end_tuple.y].setIsEnd(false);
+			}
+
 			grid[t.x][t.y].animation(t, 'T');
 			grid[t.x][t.y].setIsEnd(true);
 			end_tuple = t;
@@ -98,10 +101,11 @@ public:
 
 	void setEmpty(Tuple t) {
 		grid[t.x][t.y].animation(t, 'E');
+
 	}
 
 	void setAlgorithm(int i) {
-		a = i;
+		number_of_algorithm = i;
 	}
 
 	// getters
@@ -123,7 +127,7 @@ public:
 	}
 
 	int getAlgorithm() {
-		return a; // 1. Dijkstra   2. DFS   3.BFS
+		return number_of_algorithm; // 1. Dijkstra   2. DFS   3.BFS
 	}
 
 	double getTime() {
@@ -131,6 +135,22 @@ public:
 	}
 
 	// limpieza
+
+	void clearBegin() {
+		grid[start_tuple.x][start_tuple.y].animation(start_tuple, 'E');
+		grid[start_tuple.x][start_tuple.y].setIsStart(false);
+		start_tuple.x = -1;
+		start_tuple.y = -1;
+		start = false;
+	}
+
+	void clearEnd() {
+		grid[end_tuple.x][end_tuple.y].animation(end_tuple, 'E');
+		grid[end_tuple.x][end_tuple.y].setIsEnd(false);
+		end_tuple.x = -1;
+		end_tuple.y = -1;
+		end = false;
+	}
 
 	void total_clean() {
 
@@ -142,15 +162,32 @@ public:
 		while (!queued_nodes.empty()) queued_nodes.pop();
 	}
 
-	void partial_clean() {
+	void partial_clean(int i) { // no limpia fin
 
 		for (int x = 0; x < cols; x++)
 			for (int y = 0; y < rows; y++)
 				if (grid[x][y].getType() != 'W')
 					grid[x][y].partial_clean();
 
+		if (i == 1) {
+
+			grid[start_tuple.x][start_tuple.y].setIsStart(false);
+			grid[end_tuple.x][end_tuple.y].setType('T');
+			
+		}
+
+		else if (i == 2) {
+
+			grid[end_tuple.x][end_tuple.y].setIsEnd(false);
+			grid[start_tuple.x][start_tuple.y].setType('B');
+
+		}
+
 		while (!queued_nodes.empty()) queued_nodes.pop();
+
+
 	}
+
 
 	// - - - - -  algorithms  - - - - -
 
@@ -159,24 +196,25 @@ public:
 	void dijkstra() {
 
 		// tiempos
-//		chrono::time_point<chrono::system_clock> t_inicio, t_fin;
 
 		auto t_begin = high_resolution_clock::now();
-
 
 		set_neighbors();
 
 		bool searching = true;
 
-		grid[start_tuple.x][start_tuple.y].setStart(true);
-		grid[start_tuple.x][start_tuple.y].setQueued(true);
+		//for (auto e: grid[start_tuple.x][start_tuple.y].get_n()) 
+			//cout << e.x << ", " << e.y << endl;
+
+		grid[start_tuple.x][start_tuple.y].setIsStart(true);
+		grid[start_tuple.x][start_tuple.y].setQueued(true); // en cola
 
 		queued_nodes.push(grid[start_tuple.x][start_tuple.y]);
 
 		while (!queued_nodes.empty() && searching) {
 
 			Tuple temp = queued_nodes.front().getTuple();
-			queued_nodes.front().setVisited(true);
+			queued_nodes.front().setQueued(true); // para verificar si se puso en la cola
 			queued_nodes.pop();
 
 			if (temp == end_tuple) {
@@ -186,7 +224,8 @@ public:
 				Tuple p = grid[temp.x][temp.y].getPrior();
 
 				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
-					path.push_back(grid[p.x][p.y]);
+					//cout << "PEN" << endl;
+					//path.push_back(grid[p.x][p.y]);
 					grid[p.x][p.y].setType('P');
 					p = grid[p.x][p.y].getPrior();
 
@@ -195,9 +234,9 @@ public:
 			}
 			else {
 
-				for (auto t_n : grid[temp.x][temp.y].getNeighbours()) {
-					if (!grid[t_n.x][t_n.y].getQueued()) {
-						grid[t_n.x][t_n.y].setQueued(true);
+				for (auto t_n : grid[temp.x][temp.y].get_n()) { // iterando en los vecinos del nodo
+					if (!grid[t_n.x][t_n.y].getVisited()) { // para verificar si ese vecino ya ha sido visitado
+						grid[t_n.x][t_n.y].setVisited(true);
 						grid[t_n.x][t_n.y].setType('X');
 						grid[t_n.x][t_n.y].setPrior(temp);
 						queued_nodes.push(grid[t_n.x][t_n.y]);
@@ -206,6 +245,8 @@ public:
 			}
 			// falta cuando no hay solución
 		}
+
+		grid[start_tuple.x][start_tuple.y].setType('B');
 
 
 		auto t_end = high_resolution_clock::now();
@@ -218,6 +259,8 @@ public:
 
 
 	void set_neighbors() {
+
+		// fijar los vecinos de cada nodo
 
 		for (int x = 0; x < cols; x++)
 			for (int y = 0; y < rows; y++)
