@@ -58,22 +58,31 @@ public:
 
 					if (event.type == Event::MouseButtonPressed) {
 
-						Tuple current_pos = getTuple(); // x -> [0,39]  y -> [0,16]
+						Tuple current_pos = getTuple(); // coord del nodo donde el user dio click
 
 						if (event.mouseButton.button == Mouse::Left) {
 
-							if (selected_alg) grid.partial_clean(); // no se limpia inicio ni fin
+							// selected_alg : significa si es que el algoritmo ya ha sido mostrado en pantalla
+							if (selected_alg) grid.partial_clean(1); // no se limpia fin, en la primera 
+														// iteración es false;
+							selected_alg = false;  // revisar el orden de estos dos if 
 							
-							if (grid.getEnd() == current_pos)
+							if (grid.getEnd() == current_pos) // cuando inicio y fin se superponen, cuidado
+															//, en la primera iiteración getend = 0,0
 								grid.clearEnd(); // sus valores se ponen a -1,-1
 							
 							grid.setBegin(current_pos);
+							
 
 						} else if (event.mouseButton.button == Mouse::Right) {
 							
-							if (selected_alg) grid.partial_clean();
+							if (selected_alg) grid.partial_clean(2);
+							
+							selected_alg = false;
+							
 							if (grid.getBegin() == current_pos)
 								grid.clearBegin();
+
 							grid.setEnd(current_pos);
 						}
 
@@ -96,18 +105,20 @@ public:
 								menu.changeDynamicText(1, 0); // 1: No begin or end
 							}
 							
-							else {
+							else { // si el inicio y fin están definidos
 
 								if (event.key.code == Keyboard::Num1) {
 									menu.updateSelector(1);
 									menu.changeDynamicText(2, 0); // 2. executing dijkstra
 									grid.setAlgorithm(1);
 								}
+
 								else if (event.key.code == Keyboard::Num2) {
 									menu.updateSelector(2);
 									menu.changeDynamicText(3, 0); // 3. executing dfs
 									grid.setAlgorithm(2);
 								}
+
 								else if (event.key.code == Keyboard::Num3) {
 									menu.updateSelector(3);
 									menu.changeDynamicText(4, 0); // 4. executing bfs
@@ -118,8 +129,6 @@ public:
 
 						}
 						
-						// Ahora falta que el usuario no pueda settear el inicio o
-						// fin en una pared
 						if (event.key.code == Keyboard::Space) {
 							
 							if (grid.getAlgorithm() != 0 && (grid.isBegin() == true && grid.isEnd() == true)) {
@@ -147,7 +156,7 @@ public:
 							
 							} else menu.changeDynamicText(1,0);
 							
-						}
+						} // arreglar cuando se presiona más de una vez espacio
 
 					}
 
