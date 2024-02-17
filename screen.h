@@ -133,30 +133,31 @@ public:
 							
 							if (grid.getAlgorithm() != 0 && (grid.isBegin() == true && grid.isEnd() == true)) {
 								
-								switch (grid.getAlgorithm()) {
-								case 1: // DIJKSTRA
-									// cuando ya se ejecutó y se muestra en pantalla
-									grid.dijkstra();
-									menu.changeDynamicText(5, grid.getTime());
-									selected_alg = true;
-									break;
-								case 2: // DFS
-									// falta
-									menu.changeDynamicText(6, grid.getTime());
-									selected_alg = true;
-									break;
-								case 3: // BFS
-									// falta
-									menu.changeDynamicText(7, grid.getTime());
-									selected_alg = true;
-									break;
-								default:
-									break;
-								}
+								if (!selected_alg) 
+									switch (grid.getAlgorithm()) {
+										case 1: // DIJKSTRA
+											// cuando ya se ejecutó y se muestra en pantalla
+											grid.dijkstra();
+											menu.changeDynamicText(5, grid.getTime());
+											selected_alg = true;
+											break;
+										case 2: // DFS
+											// falta
+											menu.changeDynamicText(6, grid.getTime());
+											selected_alg = true;
+											break;
+										case 3: // BFS
+											// falta
+											menu.changeDynamicText(7, grid.getTime());
+											selected_alg = true;
+											break;
+										default:
+											break;
+									}
 							
 							} else menu.changeDynamicText(1,0);
 							
-						} // arreglar cuando se presiona más de una vez espacio
+						}
 
 					}
 
