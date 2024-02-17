@@ -34,10 +34,14 @@ private:
 	Tuple tuple;
 	int x, y;
 
-	bool is_start = false, is_end = false;
 
-	vector<Tuple> v_n;
-	bool visited = false, queued = false, start = false;
+	vector<Tuple> v_n; // para almacenar los vecinos del nodo
+
+	bool visited = false // para verificar si el nodo ya ha sido visitado
+		, queued = false // para verificar si el nodo está en la cola
+		, is_start = false // para verificar si el nodo es el comienzo
+		, is_end = false
+	; 
 	Tuple prior;
 	bool dijkstra = false;
 
@@ -62,14 +66,18 @@ public:
 
 	void animation(Tuple t, char _t) {
 
+		// necesario ??
 		square = new Sprite();
 		square->setPosition(t.x * NODE_SIZE
 							, t.y * NODE_SIZE + HEADER_HEIGHT
 						);
 		image = new Texture();
-		type = _t;
 
+		// probar luego
+
+		type = _t;
 		filterImages();
+
 	}
 
 	void filterImages() {
@@ -116,11 +124,13 @@ public:
 
 	void set_n(Node** grid) {
 
-		dijkstra = true;
+		
 		v_n.resize(0);
 
-		if (type != 'W') {
+		if (type != 'W') { // las paredes no pueden tener vecinos
 
+			dijkstra = true; // cada nodo está ejecutando dijkstra
+			// las paredes no pueden ser vecinos
 			if (x > 0 && grid[x - 1][y].type != 'W') v_n.push_back(Tuple(x - 1, y));
 			if (x < (COLS - 1) && grid[x + 1][y].type != 'W') v_n.push_back(Tuple(x + 1, y));
 
@@ -142,28 +152,23 @@ public:
 		}
 	}
 
-	void partial_clean() {
+	void partial_clean() { // solo entra el inicio
+
+
 		if (dijkstra) {
-			dijkstra = false;
-			queued = false;
+
+			dijkstra = false; // ya no estará ejecutando dijks
+			queued = false; 
 			visited = false;
 			Tuple prior;
 			v_n.clear();
-			if (is_start || is_end)
-				return ;
+			type = 'E';
 			
-			else {
-				
-				type = 'E';
-			}
 		}
 	}
 
 	// setters
 
-	void setStart(bool c) {
-		start = c;
-	}
 
 	void setQueued(bool c) {
 		queued = c;
@@ -195,6 +200,10 @@ public:
 		return queued;
 	}
 
+	bool getVisited() {
+		return visited;
+	}
+
 	char getType() const {
 		return type;
 	}
@@ -207,7 +216,7 @@ public:
 		return tuple;
 	}
 
-	vector<Tuple> getNeighbours() {
+	vector<Tuple> get_n() {
 		return v_n;
 	}
 
