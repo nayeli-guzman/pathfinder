@@ -323,6 +323,70 @@ public:
 		time = t.count();
 	}
 
+	void bfs() {
+		// Iniciar temporizador
+		auto t_begin = high_resolution_clock::now();
+
+		// Configurar vecinos
+		set_neighbors();
+
+		// Inicializar la cola para BFS
+		queue<Tuple> queue_nodes;
+
+		// Vector para registrar el camino
+		vector<Tuple> path;
+
+		// Variable para detener la búsqueda si se encuentra el nodo final
+		bool found = false;
+
+		// Marcar el nodo final como visitado y agregarlo a la cola
+		grid[end_tuple.x][end_tuple.y].setVisited(true);
+		queue_nodes.push(end_tuple);
+		path.push_back(end_tuple); // Agregar el nodo final al camino
+
+		// Bucle principal de BFS
+		while (!queue_nodes.empty()) {
+			// Extraer el nodo de la parte delantera de la cola
+			Tuple current_tuple = queue_nodes.front();
+			queue_nodes.pop();
+
+			// Si es el nodo inicial, marcar como encontrado y detener la búsqueda
+			if (current_tuple == start_tuple) {
+				found = true;
+				break;
+			}
+
+			// Marcar el nodo actual como explorado ('X')
+			if (grid[current_tuple.x][current_tuple.y].getType() != 'T') {
+				grid[current_tuple.x][current_tuple.y].setType('X');
+			}
+
+			// Explorar los vecinos del nodo actual
+			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
+				if (!grid[neighbor.x][neighbor.y].getVisited()) {
+					// Marcar el vecino como visitado y agregarlo a la cola
+					grid[neighbor.x][neighbor.y].setVisited(true);
+					queue_nodes.push(neighbor);
+					path.push_back(neighbor); // Agregar el vecino al camino
+				}
+			}
+		}
+
+		// Si se encuentra el nodo inicial, marcar el camino recorrido
+		if (found) {
+			//FALTA
+		}
+		else {
+			// Igual que Dijkstra: qué hacer si no se encuentra el camino
+		}
+
+		// Detener temporizador y calcular el tiempo transcurrido
+		auto t_end = high_resolution_clock::now();
+		duration<double, milli> t = t_end - t_begin;
+		time = t.count();
+	}
+
+
 
 	void set_neighbors() {
 
