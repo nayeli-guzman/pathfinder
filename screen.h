@@ -148,7 +148,7 @@ public:
 										selected_alg = true;
 										break;
 									case 3: // BFS
-										// falta
+										grid.bfs();
 										menu.changeDynamicText(7, grid.getTime());
 										selected_alg = true;
 										break;
