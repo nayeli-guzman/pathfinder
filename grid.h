@@ -5,6 +5,7 @@
 #include <stack>
 #include <chrono>
 #include "node.h"
+#include <vector>
 
 using namespace std;
 using namespace chrono;
@@ -17,7 +18,7 @@ private:
 	int rows, cols;
 	RenderWindow& window;
 	Node** grid;
-	Tuple start_tuple, end_tuple ;
+	Tuple start_tuple, end_tuple;
 	bool start = false, end = false;
 
 	int number_of_algorithm = 0;
@@ -31,7 +32,7 @@ private:
 		, v = false
 		, is_dijkstra = false
 		, target_node = false
-	;
+		;
 
 	// dfs
 
@@ -81,7 +82,7 @@ public:
 			start_tuple = t;
 			start = true; // ahora sí hay un start
 		}
-		
+
 	}
 
 	void setEnd(Tuple t) {
@@ -173,7 +174,7 @@ public:
 
 			grid[start_tuple.x][start_tuple.y].setIsStart(false);
 			grid[end_tuple.x][end_tuple.y].setType('T');
-			
+
 		}
 
 		else if (i == 2) {
@@ -255,6 +256,71 @@ public:
 
 		time = t.count();
 
+	}
+
+	void dfs() {
+		// Iniciar temporizador
+		auto t_begin = high_resolution_clock::now();
+
+		// Configurar vecinos
+		set_neighbors();
+
+		// Inicializar la pila para DFS
+		stack<Tuple> stack_nodes;
+
+		// Vector para registrar el camino
+		vector<Tuple> path;
+
+		// Variable para detener la búsqueda si se encuentra el nodo final
+		bool found = false;
+
+		// Marcar el nodo final como visitado y apilarlo
+		grid[end_tuple.x][end_tuple.y].setVisited(true);
+		grid[start_tuple.x][start_tuple.y].setType('B');
+		stack_nodes.push(end_tuple);
+		path.push_back(end_tuple); // Agregar el nodo final al camino
+
+		// Bucle principal de DFS
+		while (!stack_nodes.empty()) {
+			// Extraer la tupla superior de la pila
+			Tuple current_tuple = stack_nodes.top();
+			stack_nodes.pop();
+
+			// Si es el nodo inicial, marcar como encontrado y detener la búsqueda
+			if (current_tuple == start_tuple) {
+				grid[start_tuple.x][start_tuple.y].setType('B'); // Marcar el nodo inicial como 'B'
+				found = true;
+				break;
+			}
+
+			// Marcar el nodo actual como explorado ('X')
+			if (grid[current_tuple.x][current_tuple.y].getType() != 'B') {
+				grid[current_tuple.x][current_tuple.y].setType('X');
+			}
+
+			// Explorar los vecinos de la tupla actual
+			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
+				if (!grid[neighbor.x][neighbor.y].getVisited()) {
+					// Marcar el vecino como visitado y apilar su tupla
+					grid[neighbor.x][neighbor.y].setVisited(true);
+					stack_nodes.push(neighbor);
+					path.push_back(neighbor); // Agregar el vecino al camino
+				}
+			}
+		}
+
+		// Si se encuentra el nodo inicial, marcar el camino recorrido
+		if (found) {
+			//FALTA
+		}
+		else {
+			//Igual que dijkstra falta que hacer si no se encuentra el camino
+		}
+
+		// Detener temporizador y calcular el tiempo transcurrido
+		auto t_end = high_resolution_clock::now();
+		duration<double, milli> t = t_end - t_begin;
+		time = t.count();
 	}
 
 
