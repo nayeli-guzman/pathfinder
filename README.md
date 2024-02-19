@@ -13,8 +13,8 @@
 
 - BFS: Ya esta implementado, solo falta pintar el camino que se tomo.
 
-- Modificar el mapa para que se hagan mas caminos (o menos)?
+- Modificar el laberinto para que todo este conectado.
 
-- Poder cambiar el size del  mapa
+- Crear un mapa
 
 - Hacer la tabla de tiemposs (más adelante lo haré, cuando estén los demás alg,:)
