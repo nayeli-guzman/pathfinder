@@ -16,3 +16,13 @@
 - Crear un mapa (Del mismo laberinto borrar algunas walls)
 
 - Hacer la tabla de tiemposs (más adelante lo haré, cuando estén los demás alg,:)
+
+- Implementar varios patrones de diseño
+
+- Usar hilos
+
+-Video
+
+-Demo
+
+-Readme
