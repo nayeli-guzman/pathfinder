@@ -99,6 +99,10 @@ public:
 			image->loadFromFile("sprites/explored_sprite.png");
 			square->setTexture(*image);
 			break;
+		case 'Q': // en cola
+			image->loadFromFile("sprites/queued_sprite.png");
+			square->setTexture(*image);
+			break;
 		case 'B': // begin
 			image->loadFromFile("sprites/start_sprite.png");
 			square->setTexture(*image);
@@ -118,6 +122,7 @@ public:
 	void draw(RenderWindow& w) {
 		filterImages();
 		w.draw(*square);
+		
 	}
 
 	// dijkstra
@@ -143,6 +148,8 @@ public:
 
 	void total_clean() {
 		if (dijkstra) {
+			is_start = false;
+			is_end = false;
 			dijkstra = false;
 			queued = false;
 			visited = false;
@@ -180,6 +187,8 @@ public:
 
 	void setType(char c) {
 		type = c;
+		
+		
 	}
 
 	void setPrior(Tuple c) {
