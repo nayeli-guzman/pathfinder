@@ -277,8 +277,8 @@ public:
 		// Marcar el nodo final como visitado y apilarlo
 		grid[end_tuple.x][end_tuple.y].setVisited(true);
 		grid[start_tuple.x][start_tuple.y].setType('B');
-		stack_nodes.push(end_tuple);
-		path.push_back(end_tuple); // Agregar el nodo final al camino
+		stack_nodes.push(start_tuple);
+		path.push_back(start_tuple); // Agregar el nodo inicial al camino
 
 		// Bucle principal de DFS
 		while (!stack_nodes.empty()) {
@@ -287,7 +287,7 @@ public:
 			stack_nodes.pop();
 
 			// Si es el nodo inicial, marcar como encontrado y detener la búsqueda
-			if (current_tuple == start_tuple) {
+			if (current_tuple == end_tuple) {
 				grid[start_tuple.x][start_tuple.y].setType('B'); // Marcar el nodo inicial como 'B'
 				found = true;
 				break;
@@ -341,8 +341,8 @@ public:
 
 		// Marcar el nodo final como visitado y agregarlo a la cola
 		grid[end_tuple.x][end_tuple.y].setVisited(true);
-		queue_nodes.push(end_tuple);
-		path.push_back(end_tuple); // Agregar el nodo final al camino
+		queue_nodes.push(start_tuple);
+		path.push_back(start_tuple); // Agregar el nodo inicial al camino
 
 		// Bucle principal de BFS
 		while (!queue_nodes.empty()) {
@@ -351,13 +351,13 @@ public:
 			queue_nodes.pop();
 
 			// Si es el nodo inicial, marcar como encontrado y detener la búsqueda
-			if (current_tuple == start_tuple) {
+			if (current_tuple == end_tuple) {
 				found = true;
 				break;
 			}
 
 			// Marcar el nodo actual como explorado ('X')
-			if (grid[current_tuple.x][current_tuple.y].getType() != 'T') {
+			if (grid[current_tuple.x][current_tuple.y].getType() != 'B') {
 				grid[current_tuple.x][current_tuple.y].setType('X');
 			}
 
