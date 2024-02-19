@@ -55,12 +55,10 @@ public:
 
 	void setBackgrounds() {
 
-		float radius = 0.2;
-
 		// background of the header
 
 		b_menu = RectangleShape(Vector2f(width, height));
-		b_menu.setFillColor(Color(60, 100, 250, 100));
+		b_menu.setFillColor(Color(150, 160, 210, 255));
 		b_menu.setPosition(0, 0);
 
 		// background of algorithms
@@ -182,8 +180,8 @@ public:
 			case 7:
 				t5 = "BFS tomó " + to_string(t) + " ms";
 				break;
-		default:
-			break;
+			default:
+				break;
 		}
 
 		text_5.setString(t5);
