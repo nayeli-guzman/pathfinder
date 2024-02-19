@@ -336,7 +336,7 @@ public:
 				break;
 			}
 
-			if (grid[current_tuple.x][current_tuple.y].getType() != 'B') {
+			if (current_tuple != start_tuple && current_tuple != end_tuple) {
 				grid[current_tuple.x][current_tuple.y].setType('X');
 				draw(); // Dibuja el estado actual
 				menu.draw();
@@ -348,6 +348,13 @@ public:
 					grid[neighbor.x][neighbor.y].setVisited(true);
 					grid[neighbor.x][neighbor.y].setPrior(current_tuple);
 					stack_nodes.push(neighbor);
+
+					if (neighbor != start_tuple && neighbor != end_tuple) {
+						grid[neighbor.x][neighbor.y].setType('Q'); // Establecer tipo como 'Q'
+						draw();
+						menu.draw();
+						sleep(sf::milliseconds(3));
+					}
 				}
 			}
 		}
@@ -356,6 +363,7 @@ public:
 
 
 	}
+
 
 
 	void dfs_time() {
@@ -386,8 +394,6 @@ public:
 				}
 				break;
 			}
-
-
 
 
 			// Explorar los vecinos del nodo actual
@@ -423,11 +429,9 @@ public:
 
 		// Bucle principal de BFS
 		while (!queue_nodes.empty()) {
-			// Extraer el nodo de la parte delantera de la cola
 			Tuple current_tuple = queue_nodes.front();
 			queue_nodes.pop();
 
-			// Si es el nodo final, marcar como encontrado y detener la búsqueda
 			if (current_tuple == end_tuple) {
 				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
 				while (p != start_tuple) {
@@ -437,27 +441,32 @@ public:
 				break;
 			}
 
-			// Marcar el nodo actual como explorado ('X')
-			if (grid[current_tuple.x][current_tuple.y].getType() != 'B') {
+			if (current_tuple != start_tuple && current_tuple != end_tuple) {
 				grid[current_tuple.x][current_tuple.y].setType('X');
 				draw(); // Dibuja el estado actual
 				menu.draw();
 				sleep(sf::milliseconds(3));
 			}
 
-			// Explorar los vecinos del nodo actual
 			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
 				if (!grid[neighbor.x][neighbor.y].getVisited()) {
-					// Marcar el vecino como visitado y agregarlo a la cola
 					grid[neighbor.x][neighbor.y].setVisited(true);
 					grid[neighbor.x][neighbor.y].setPrior(current_tuple);
 					queue_nodes.push(neighbor);
+
+					if (neighbor != start_tuple && neighbor != end_tuple) {
+						grid[neighbor.x][neighbor.y].setType('Q'); // Establecer tipo como 'Q'
+						draw();
+						menu.draw();
+						sleep(sf::milliseconds(3));
+					}
 				}
 			}
 		}
 
 		grid[start_tuple.x][start_tuple.y].setType('B');
 	}
+
 
 
 	void bfs_time() {
