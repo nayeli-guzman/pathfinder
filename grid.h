@@ -204,9 +204,6 @@ public:
 
 		bool searching = true;
 
-		//for (auto e: grid[start_tuple.x][start_tuple.y].get_n()) 
-			//cout << e.x << ", " << e.y << endl;
-
 		grid[start_tuple.x][start_tuple.y].setIsStart(true);
 		grid[start_tuple.x][start_tuple.y].setQueued(true); // en cola
 
@@ -253,58 +250,60 @@ public:
 
 	}
 
-	void dfs() {
-		// Iniciar temporizador
-		auto t_begin = high_resolution_clock::now();
-			
-		// Configurar vecinos
-		set_neighbors();
+void dfs() {
+    // Iniciar temporizador
+    auto t_begin = high_resolution_clock::now();
 
-		// Inicializar la pila para DFS
-		stack<Tuple> stack_nodes;
+    // Configurar vecinos
+    set_neighbors();
 
-		// Marcar el nodo final como visitado y apilarlo
-		grid[end_tuple.x][end_tuple.y].setVisited(true);
-		grid[start_tuple.x][start_tuple.y].setType('B');
-		stack_nodes.push(start_tuple);
+    // Inicializar la pila para DFS
+    stack<Tuple> stack_nodes;
 
-		// Bucle principal de DFS
-		while (!stack_nodes.empty()) {
-			// Extraer la tupla superior de la pila
-			Tuple current_tuple = stack_nodes.top();
-			stack_nodes.pop();
+    // Marcar el nodo inicial como visitado y agregarlo a la pila
+    grid[start_tuple.x][start_tuple.y].setVisited(true);
+    stack_nodes.push(start_tuple);
 
-			// Si es el nodo inicial, marcar como encontrado y detener la búsqueda
-			if (current_tuple == end_tuple) {
-				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
-				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
-					grid[p.x][p.y].setType('P');
-					p = grid[p.x][p.y].getPrior();
-				}
-				break;
-			}
+    // Bucle principal de DFS
+    while (!stack_nodes.empty()) {
+        // Extraer el nodo de la cima de la pila
+        Tuple current_tuple = stack_nodes.top();
+        stack_nodes.pop();
 
-			// Marcar el nodo actual como explorado ('X')
-			if (grid[current_tuple.x][current_tuple.y].getType() != 'B') {
-				grid[current_tuple.x][current_tuple.y].setType('X');
-			}
+        // Si es el nodo final, marcar como encontrado y detener la búsqueda
+        if (current_tuple == end_tuple) {
+            Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
+            while ((p != start_tuple)) {
+                grid[p.x][p.y].setType('P');
+                p = grid[p.x][p.y].getPrior();
+            }
+            break;
+        }
 
-			// Explorar los vecinos de la tupla actual
-			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
-				if (!grid[neighbor.x][neighbor.y].getVisited()) {
-					// Marcar el vecino como visitado y apilar su tupla
-					grid[neighbor.x][neighbor.y].setVisited(true);
-					stack_nodes.push(neighbor);
-				}
-			}
-		}
+        // Marcar el nodo actual como explorado ('X')
+        if (grid[current_tuple.x][current_tuple.y].getType() != 'B') {
+            grid[current_tuple.x][current_tuple.y].setType('X');
+        }
 
-		// Detener temporizador y calcular el tiempo transcurrido
-		auto t_end = high_resolution_clock::now();
-		duration<double, milli> t = t_end - t_begin;
-		time = t.count();
-	}
+        // Explorar los vecinos del nodo actual
+        for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
+            if (!grid[neighbor.x][neighbor.y].getVisited()) {
+                // Marcar el vecino como visitado y agregarlo a la pila
+                grid[neighbor.x][neighbor.y].setVisited(true);
+                grid[neighbor.x][neighbor.y].setPrior(current_tuple);
+                stack_nodes.push(neighbor);
+            }
+        }
+    }
 
+    // Detener temporizador y calcular el tiempo transcurrido
+    auto t_end = high_resolution_clock::now();
+    duration<double, milli> t = t_end - t_begin;
+    time = t.count();
+}
+
+
+	//corregir
 	void bfs() {
 		// Iniciar temporizador
 		auto t_begin = high_resolution_clock::now();
@@ -315,8 +314,8 @@ public:
 		// Inicializar la cola para BFS
 		queue<Tuple> queue_nodes;
 
-		// Marcar el nodo final como visitado y agregarlo a la cola
-		grid[end_tuple.x][end_tuple.y].setVisited(true);
+		// Marcar el nodo inicial como visitado y agregarlo a la cola
+		grid[start_tuple.x][start_tuple.y].setVisited(true);
 		queue_nodes.push(start_tuple);
 
 		// Bucle principal de BFS
@@ -325,10 +324,10 @@ public:
 			Tuple current_tuple = queue_nodes.front();
 			queue_nodes.pop();
 
-			// Si es el nodo inicial, marcar como encontrado y detener la búsqueda
+			// Si es el nodo final, marcar como encontrado y detener la búsqueda
 			if (current_tuple == end_tuple) {
 				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
-				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
+				while ((p != start_tuple)) {
 					grid[p.x][p.y].setType('P');
 					p = grid[p.x][p.y].getPrior();
 				}
@@ -345,19 +344,18 @@ public:
 				if (!grid[neighbor.x][neighbor.y].getVisited()) {
 					// Marcar el vecino como visitado y agregarlo a la cola
 					grid[neighbor.x][neighbor.y].setVisited(true);
+					grid[neighbor.x][neighbor.y].setPrior(current_tuple);
 					queue_nodes.push(neighbor);
 				}
 			}
 		}
-
-
-
 
 		// Detener temporizador y calcular el tiempo transcurrido
 		auto t_end = high_resolution_clock::now();
 		duration<double, milli> t = t_end - t_begin;
 		time = t.count();
 	}
+
 
 	void set_neighbors() {
 
