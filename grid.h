@@ -4,8 +4,9 @@
 #include <queue>
 #include <stack>
 #include <chrono>
-#include "node.h"
 #include <vector>
+#include "node.h"
+#include "menu.h"
 
 using namespace std;
 using namespace chrono;
@@ -18,7 +19,7 @@ private:
 	int rows, cols;
 	RenderWindow& window;
 	Node** grid;
-	Tuple start_tuple, end_tuple;
+	Tuple start_tuple, end_tuple ;
 	bool start = false, end = false;
 
 	int number_of_algorithm = 0;
@@ -32,7 +33,7 @@ private:
 		, v = false
 		, is_dijkstra = false
 		, target_node = false
-		;
+	;
 
 	// dfs
 
@@ -82,7 +83,7 @@ public:
 			start_tuple = t;
 			start = true; // ahora sí hay un start
 		}
-
+		
 	}
 
 	void setEnd(Tuple t) {
@@ -174,7 +175,7 @@ public:
 
 			grid[start_tuple.x][start_tuple.y].setIsStart(false);
 			grid[end_tuple.x][end_tuple.y].setType('T');
-
+			
 		}
 
 		else if (i == 2) {
@@ -194,7 +195,7 @@ public:
 
 	// dijkstra
 
-	void dijkstra() {
+	void dijkstra(Menu menu) {
 
 		// tiempos
 
@@ -210,9 +211,20 @@ public:
 		queued_nodes.push(grid[start_tuple.x][start_tuple.y]);
 
 		while (!queued_nodes.empty() && searching) {
+			// cuando entra a este bucle es pq está siendo visitado
 
 			Tuple temp = queued_nodes.front().getTuple();
-			queued_nodes.front().setQueued(true); // para verificar si se puso en la cola
+
+			if (temp != start_tuple && temp != end_tuple) {
+				grid[temp.x][temp.y].setType('X');
+				draw();
+				menu.draw();
+				sleep(sf::milliseconds(3));
+			}
+			
+			
+
+			queued_nodes.front().setVisited(true); // para verificar si se puso en la cola
 			queued_nodes.pop();
 
 			if (temp == end_tuple) {
@@ -222,25 +234,46 @@ public:
 				Tuple p = grid[temp.x][temp.y].getPrior();
 
 				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
+					//path.push_back(grid[p.x][p.y]);
 					grid[p.x][p.y].setType('P');
 					p = grid[p.x][p.y].getPrior();
+
 				}
 
 			}
 			else {
 
 				for (auto t_n : grid[temp.x][temp.y].get_n()) { // iterando en los vecinos del nodo
-					if (!grid[t_n.x][t_n.y].getVisited()) { // para verificar si ese vecino ya ha sido visitado
-						grid[t_n.x][t_n.y].setVisited(true);
-						grid[t_n.x][t_n.y].setType('X');
+					if (!grid[t_n.x][t_n.y].getQueued()) { // para verificar si ese vecino ya ha sido visitado
+						grid[t_n.x][t_n.y].setQueued(true);
+						
 						grid[t_n.x][t_n.y].setPrior(temp);
 						queued_nodes.push(grid[t_n.x][t_n.y]);
+
+						if (t_n != start_tuple && t_n != end_tuple) {
+
+							grid[t_n.x][t_n.y].setType('Q');
+							draw();
+							menu.draw();
+							sleep(sf::milliseconds(3));
+						}
+						
+
+
+						//grid[t_n.x][t_n.y].draw(window);
+						
+						
+
+						//draw();
+						
 					}
 				}
 			}
+			// falta cuando no hay solución
 		}
 
 		grid[start_tuple.x][start_tuple.y].setType('B');
+
 
 		auto t_end = high_resolution_clock::now();
 
@@ -250,61 +283,68 @@ public:
 
 	}
 
-void dfs() {
-    // Iniciar temporizador
-    auto t_begin = high_resolution_clock::now();
+	// dfs
 
-    // Configurar vecinos
-    set_neighbors();
+	void dfs() {
+		// Iniciar temporizador
+		auto t_begin = high_resolution_clock::now();
 
-    // Inicializar la pila para DFS
-    stack<Tuple> stack_nodes;
+		// Configurar vecinos
+		set_neighbors();
 
-    // Marcar el nodo inicial como visitado y agregarlo a la pila
-    grid[start_tuple.x][start_tuple.y].setVisited(true);
-    stack_nodes.push(start_tuple);
+		// Inicializar la pila para DFS
+		stack<Tuple> stack_nodes;
 
-    // Bucle principal de DFS
-    while (!stack_nodes.empty()) {
-        // Extraer el nodo de la cima de la pila
-        Tuple current_tuple = stack_nodes.top();
-        stack_nodes.pop();
+		// Marcar el nodo inicial como visitado y agregarlo a la pila
+		grid[start_tuple.x][start_tuple.y].setVisited(true); // modifying nodos
+		stack_nodes.push(start_tuple);
 
-        // Si es el nodo final, marcar como encontrado y detener la búsqueda
-        if (current_tuple == end_tuple) {
-            Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
-            while ((p != start_tuple)) {
-                grid[p.x][p.y].setType('P');
-                p = grid[p.x][p.y].getPrior();
-            }
-            break;
-        }
+		// Bucle principal de DFS
+		while (!stack_nodes.empty()) {
+			// Extraer el nodo de la cima de la pila
+			Tuple current_tuple = stack_nodes.top();
+			stack_nodes.pop();
 
-        // Marcar el nodo actual como explorado ('X')
-        if (grid[current_tuple.x][current_tuple.y].getType() != 'B') {
-            grid[current_tuple.x][current_tuple.y].setType('X');
-        }
+			// Si es el nodo final, marcar como encontrado y detener la búsqueda
+			if (current_tuple == end_tuple) {
+				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
+				while ((p != start_tuple)) {
+					grid[p.x][p.y].setType('P');
+					p = grid[p.x][p.y].getPrior();
+				}
+				break;
+			}
 
-        // Explorar los vecinos del nodo actual
-        for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
-            if (!grid[neighbor.x][neighbor.y].getVisited()) {
-                // Marcar el vecino como visitado y agregarlo a la pila
-                grid[neighbor.x][neighbor.y].setVisited(true);
-                grid[neighbor.x][neighbor.y].setPrior(current_tuple);
-                stack_nodes.push(neighbor);
-            }
-        }
-    }
+			
+			// Marcar el nodo actual como explorado ('X')
+			if (grid[current_tuple.x][current_tuple.y].getType() != 'B') {
+				grid[current_tuple.x][current_tuple.y].setType('X');
+			}
+			
 
-    // Detener temporizador y calcular el tiempo transcurrido
-    auto t_end = high_resolution_clock::now();
-    duration<double, milli> t = t_end - t_begin;
-    time = t.count();
-}
+			// Explorar los vecinos del nodo actual
+			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
+				if (!grid[neighbor.x][neighbor.y].getVisited()) {
+					// Marcar el vecino como visitado y agregarlo a la pila
+					grid[neighbor.x][neighbor.y].setVisited(true);
+					grid[neighbor.x][neighbor.y].setPrior(current_tuple);
+					stack_nodes.push(neighbor);
+				}
+			}
+		}
 
+		grid[start_tuple.x][start_tuple.y].setType('B');
 
-	//corregir
+		// Detener temporizador y calcular el tiempo transcurrido
+		auto t_end = high_resolution_clock::now();
+		duration<double, milli> t = t_end - t_begin;
+		time = t.count();
+	}
+
+	// bfs
+
 	void bfs() {
+		
 		// Iniciar temporizador
 		auto t_begin = high_resolution_clock::now();
 
@@ -334,10 +374,12 @@ void dfs() {
 				break;
 			}
 
+			
 			// Marcar el nodo actual como explorado ('X')
 			if (grid[current_tuple.x][current_tuple.y].getType() != 'B') {
 				grid[current_tuple.x][current_tuple.y].setType('X');
 			}
+			
 
 			// Explorar los vecinos del nodo actual
 			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
@@ -350,12 +392,13 @@ void dfs() {
 			}
 		}
 
+		grid[start_tuple.x][start_tuple.y].setType('B');
+
 		// Detener temporizador y calcular el tiempo transcurrido
 		auto t_end = high_resolution_clock::now();
 		duration<double, milli> t = t_end - t_begin;
 		time = t.count();
 	}
-
 
 	void set_neighbors() {
 
@@ -364,6 +407,7 @@ void dfs() {
 		for (int x = 0; x < cols; x++)
 			for (int y = 0; y < rows; y++)
 				grid[x][y].set_n(grid);
+
 
 	}
 
@@ -390,7 +434,7 @@ void dfs() {
 				int randIndex = rand() % neighbors.size();
 				Node* neighbor = neighbors[randIndex];
 
-				// Marcar el vecino como Wall
+				// Marcar el vecino aleatorio como Wall
 				neighbor->setType('W');
 
 				// Marcar el espacio entre el nodo actual y el vecino como Empty
@@ -400,7 +444,8 @@ void dfs() {
 
 				// Agregar el vecino a la pila
 				stack.push(neighbor);
-				stack.push(current); // Agregar el nodo actual nuevamente a la pila para continuar con su exploración
+				stack.push(current); // Agregar el nodo actual nuevamente a la 
+									 //pila para continuar con su exploración
 			}
 		}
 	}
@@ -409,6 +454,7 @@ void dfs() {
 	vector<Node*> getUnvisitedNeighbors(Node* current) {
 		vector<Node*> neighbors;
 		Tuple pos = current->getTuple();
+		// pos actual 
 		int x = pos.x;
 		int y = pos.y;
 
@@ -420,5 +466,6 @@ void dfs() {
 
 		return neighbors;
 	}
+
 
 };
