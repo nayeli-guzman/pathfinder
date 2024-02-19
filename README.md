@@ -7,11 +7,11 @@
 
 **grid.h**
 
-- modificaciones en la parte de limpieza parcial
+
 
 **Observaciones/Falta:**
 
-- Modificar el laberinto para que todo este conectado.
+- Modificar el laberinto para que todo este conectado. (Modificar generateMazeDFS o todo de nuevo).
 
 - Crear un mapa (Del mismo laberinto borrar algunas walls)
 
