@@ -9,9 +9,9 @@
 
 **Observaciones/Falta:**
 
-- DFS: Ya esta implementado, solo falta pintar el camino que se tomo y algo extra que aun no le encuentro el sentido: En el codigo se viera como si fuera de final a inicio pero realmente lo hace de inicio a final, no se como corregirlo. Si puedo te lo explico mañana
+- DFS: 
 
-- BFS: corregir y pintar el camino que se tomo.
+- BFS: 
 
 - Modificar el laberinto para que todo este conectado.
 
