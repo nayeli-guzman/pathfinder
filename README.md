@@ -1,6 +1,6 @@
 # pathfinder
 
-**screen.h:** implementado tanto dfs como bfs
+**screen.h:** 
 **menu.h:**
 
 **grid.h**
@@ -9,12 +9,8 @@
 
 **Observaciones/Falta:**
 
-- DFS: 
-
-- BFS: 
-
 - Modificar el laberinto para que todo este conectado.
 
-- Crear un mapa
+- Crear un mapa (Del mismo laberinto borrar algunas walls)
 
 - Hacer la tabla de tiemposs (más adelante lo haré, cuando estén los demás alg,:)
