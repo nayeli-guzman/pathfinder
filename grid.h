@@ -225,11 +225,8 @@ public:
 				Tuple p = grid[temp.x][temp.y].getPrior();
 
 				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
-					//cout << "PEN" << endl;
-					//path.push_back(grid[p.x][p.y]);
 					grid[p.x][p.y].setType('P');
 					p = grid[p.x][p.y].getPrior();
-
 				}
 
 			}
@@ -244,11 +241,9 @@ public:
 					}
 				}
 			}
-			// falta cuando no hay solución
 		}
 
 		grid[start_tuple.x][start_tuple.y].setType('B');
-
 
 		auto t_end = high_resolution_clock::now();
 
@@ -261,24 +256,17 @@ public:
 	void dfs() {
 		// Iniciar temporizador
 		auto t_begin = high_resolution_clock::now();
-
+			
 		// Configurar vecinos
 		set_neighbors();
 
 		// Inicializar la pila para DFS
 		stack<Tuple> stack_nodes;
 
-		// Vector para registrar el camino
-		vector<Tuple> path;
-
-		// Variable para detener la búsqueda si se encuentra el nodo final
-		bool found = false;
-
 		// Marcar el nodo final como visitado y apilarlo
 		grid[end_tuple.x][end_tuple.y].setVisited(true);
 		grid[start_tuple.x][start_tuple.y].setType('B');
 		stack_nodes.push(start_tuple);
-		path.push_back(start_tuple); // Agregar el nodo inicial al camino
 
 		// Bucle principal de DFS
 		while (!stack_nodes.empty()) {
@@ -288,8 +276,11 @@ public:
 
 			// Si es el nodo inicial, marcar como encontrado y detener la búsqueda
 			if (current_tuple == end_tuple) {
-				grid[start_tuple.x][start_tuple.y].setType('B'); // Marcar el nodo inicial como 'B'
-				found = true;
+				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
+				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
+					grid[p.x][p.y].setType('P');
+					p = grid[p.x][p.y].getPrior();
+				}
 				break;
 			}
 
@@ -304,17 +295,8 @@ public:
 					// Marcar el vecino como visitado y apilar su tupla
 					grid[neighbor.x][neighbor.y].setVisited(true);
 					stack_nodes.push(neighbor);
-					path.push_back(neighbor); // Agregar el vecino al camino
 				}
 			}
-		}
-
-		// Si se encuentra el nodo inicial, marcar el camino recorrido
-		if (found) {
-			//FALTA
-		}
-		else {
-			//Igual que dijkstra falta que hacer si no se encuentra el camino
 		}
 
 		// Detener temporizador y calcular el tiempo transcurrido
@@ -333,16 +315,9 @@ public:
 		// Inicializar la cola para BFS
 		queue<Tuple> queue_nodes;
 
-		// Vector para registrar el camino
-		vector<Tuple> path;
-
-		// Variable para detener la búsqueda si se encuentra el nodo final
-		bool found = false;
-
 		// Marcar el nodo final como visitado y agregarlo a la cola
 		grid[end_tuple.x][end_tuple.y].setVisited(true);
 		queue_nodes.push(start_tuple);
-		path.push_back(start_tuple); // Agregar el nodo inicial al camino
 
 		// Bucle principal de BFS
 		while (!queue_nodes.empty()) {
@@ -352,7 +327,11 @@ public:
 
 			// Si es el nodo inicial, marcar como encontrado y detener la búsqueda
 			if (current_tuple == end_tuple) {
-				found = true;
+				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
+				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
+					grid[p.x][p.y].setType('P');
+					p = grid[p.x][p.y].getPrior();
+				}
 				break;
 			}
 
@@ -367,26 +346,18 @@ public:
 					// Marcar el vecino como visitado y agregarlo a la cola
 					grid[neighbor.x][neighbor.y].setVisited(true);
 					queue_nodes.push(neighbor);
-					path.push_back(neighbor); // Agregar el vecino al camino
 				}
 			}
 		}
 
-		// Si se encuentra el nodo inicial, marcar el camino recorrido
-		if (found) {
-			//FALTA
-		}
-		else {
-			// Igual que Dijkstra: qué hacer si no se encuentra el camino
-		}
+
+
 
 		// Detener temporizador y calcular el tiempo transcurrido
 		auto t_end = high_resolution_clock::now();
 		duration<double, milli> t = t_end - t_begin;
 		time = t.count();
 	}
-
-
 
 	void set_neighbors() {
 
@@ -396,9 +367,7 @@ public:
 			for (int y = 0; y < rows; y++)
 				grid[x][y].set_n(grid);
 
-
 	}
-
 
 	void generateMazeDFS() {
 		// Elegir una posición de inicio aleatoria
@@ -453,6 +422,5 @@ public:
 
 		return neighbors;
 	}
-
 
 };
