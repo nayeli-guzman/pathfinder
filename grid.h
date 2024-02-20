@@ -449,45 +449,101 @@ public:
 
 
 	}
-
 	void generateMazeDFS() {
+		// Restablecer el laberinto
+		resetMaze();
+
+		// Crear una pila para DFS
+		stack<Node*> pila;
+
 		// Elegir una posición de inicio aleatoria
 		int startX = rand() % cols;
 		int startY = rand() % rows;
+		grid[startX][startY].setType('W'); // Marcar el nodo inicial como pared
+		pila.push(&grid[startX][startY]); // Empujar el nodo inicial a la pila
 
-		// Crear una pila para realizar DFS
-		stack<Node*> stack;
-		grid[startX][startY].setType('W'); // Marcar el nodo inicial como Wall
-		stack.push(&grid[startX][startY]); // Agregar el nodo inicial a la pila
+		// DFS para generar el laberinto
+		while (!pila.empty()) {
+			Node* actual = pila.top();
+			pila.pop();
 
-		while (!stack.empty()) {
-			Node* current = stack.top();
-			stack.pop();
+			// Obtener vecinos no visitados
+			vector<Node*> vecinos = getUnvisitedNeighbors(actual);
 
-			// Obtener los vecinos no visitados del nodo actual
-			vector<Node*> neighbors = getUnvisitedNeighbors(current);
+			// Elegir aleatoriamente un vecino y conectarlo
+			if (!vecinos.empty()) {
+				int indiceAleatorio = rand() % vecinos.size();
+				Node* vecino = vecinos[indiceAleatorio];
+				vecino->setType('W'); // Marcar el vecino como pared
+				int x = actual->getTuple().x + (vecino->getTuple().x - actual->getTuple().x) / 2;
+				int y = actual->getTuple().y + (vecino->getTuple().y - actual->getTuple().y) / 2;
+				grid[x][y].setType('W'); // Marcar el espacio entre el nodo actual y el vecino como pared
+				pila.push(vecino); // Empujar el vecino a la pila
+				pila.push(actual); // Empujar el nodo actual nuevamente para continuar la exploración
+			}
+		}
 
-			// Si hay vecinos no visitados
-			if (!neighbors.empty()) {
-				// Escoger un vecino aleatorio
-				int randIndex = rand() % neighbors.size();
-				Node* neighbor = neighbors[randIndex];
+		// Verificar que no haya espacios vacíos aislados
+		if (verificarEspaciosAislados()) {
+			generateMazeDFS();
+		}
+	}
 
-				// Marcar el vecino aleatorio como Wall
-				neighbor->setType('W');
 
-				// Marcar el espacio entre el nodo actual y el vecino como Empty
-				int x = current->getTuple().x + (neighbor->getTuple().x - current->getTuple().x) / 2;
-				int y = current->getTuple().y + (neighbor->getTuple().y - current->getTuple().y) / 2;
-				grid[x][y].setType('W');
 
-				// Agregar el vecino a la pila
-				stack.push(neighbor);
-				stack.push(current); // Agregar el nodo actual nuevamente a la 
-				//pila para continuar con su exploración
+
+	void resetMaze() {
+		// Reset los nodos como Empty y false
+		for (int x = 0; x < cols; ++x) {
+			for (int y = 0; y < rows; ++y) {
+				grid[x][y].setType('E');
+				grid[x][y].setVisited(false);
 			}
 		}
 	}
+
+
+	bool verificarEspaciosAislados() {
+		// Realizar el algoritmo de inundación para verificar espacios vacíos aislados
+		// Comenzar la inundación desde un espacio vacío aleatorio
+		int startX, startY;
+		do {
+			startX = rand() % cols;
+			startY = rand() % rows;
+		} while (grid[startX][startY].getType() != 'E'); // Encontrar un espacio vacío aleatorio
+
+		// Realizar la inundación desde el espacio vacío aleatorio
+		inundarEspacios(startX, startY);
+
+		// Verificar si todos los espacios vacíos han sido visitados
+		for (int x = 0; x < cols; ++x) {
+			for (int y = 0; y < rows; ++y) {
+				if (grid[x][y].getType() == 'E' && !grid[x][y].getVisited()) {
+					// Se encontró un espacio vacío aislado
+					return true;
+				}
+			}
+		}
+
+		// No se encontraron espacios vacíos aislados
+		return false;
+	}
+
+	void inundarEspacios(int x, int y) {
+		// Verificar si la posición actual está dentro de los límites y es un espacio vacío no visitado
+		if (x >= 0 && x < cols && y >= 0 && y < rows && grid[x][y].getType() == 'E' && !grid[x][y].getVisited()) {
+			// Marcar el espacio actual como visitado
+			grid[x][y].setVisited(true);
+
+			// Realizar la inundación de manera recursiva en las cuatro direcciones
+			inundarEspacios(x + 1, y); // Derecha
+			inundarEspacios(x - 1, y); // Izquierda
+			inundarEspacios(x, y + 1); // Abajo
+			inundarEspacios(x, y - 1); // Arriba
+		}
+	}
+
+
 
 	// Función para obtener los vecinos no visitados de un nodo
 	vector<Node*> getUnvisitedNeighbors(Node* current) {
