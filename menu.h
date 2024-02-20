@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <algorithm>
+#include <map>
 #include <iostream>
 
 using namespace std;
@@ -12,9 +13,11 @@ class Menu {
 private:
 	int height, width, bottom;
 	RenderWindow& window;
-	RectangleShape b_menu, b_algorithms, b_selector, b_help;
+	RectangleShape b_menu, b_algorithms, b_selector, b_help, b_table;
 	Font font_1, font_2, font_3;
-	Text text_1, text_2, text_3, text_4, text_5, text_6, text_7, text_8;
+	Text text_1, text_2, text_3, text_4, text_5, text_6, text_7, text_8
+		, text_9
+		;
 	string t1 = "Bienvenido"
 		, t2 = "Presione 'M' para abrir el menu"
 		, t3 = "Informacion"
@@ -27,15 +30,18 @@ private:
 				"\n\n[anticlick]\t Fin"
 		, t8 = "Para reiniciar el mapa y ejecutar otro algoritmo, "
 				"\n\n	debe presionar 'C' y repetir el proceso\n\n				 de seleccion"
+		, t9 = "Comparacion"
+		
 		;
+
+	map<string, double> times;
+
+	vector<string> times_str;
 	vector<string> help_alg{ "[1]\t Dijkstra", "[2]\t BFS", "[3]\t DFS" };
-	vector<Text> help_txt;
 
-	vector<Text> alg_txt;
+	vector<Text> alg_txt, help_txt, times_txt;
 	vector<string> algorithms{ "Dijkstra", "DFS", "BFS" };
-	bool help_w = false;
-
-	
+	bool help_w = false, comparison_t = false;
 
 public:
 
@@ -50,6 +56,7 @@ public:
 		setBackgrounds();
 		setTexts();
 		setTextHelpWindow();
+		//setTextComparison();
 
 	}
 
@@ -75,6 +82,11 @@ public:
 		b_help = RectangleShape(Vector2f(NODE_SIZE * 21, NODE_SIZE * 15));
 		b_help.setFillColor(Color(55, 55, 55, 255));
 		b_help.setPosition(width / 2 - 10.5 * NODE_SIZE, 150);
+
+		// background of table of positions
+		b_table = RectangleShape(Vector2f(NODE_SIZE * 21, NODE_SIZE * 15));
+		b_table.setFillColor(Color(55, 55, 55, 255));
+		b_table.setPosition(width / 2 - 10.5 * NODE_SIZE, 150);
 
 
 	}
@@ -156,6 +168,31 @@ public:
 
 	}
 
+	void setTextComparison() {
+
+		// title
+		text_9.setFont(font_1);
+		text_9.setString(t9);
+		text_9.setCharacterSize(30);
+		text_9.setPosition(width / 2 - 3.25 * NODE_SIZE, 150 + 1.5 * NODE_SIZE);
+
+		times_str.resize(4);
+		times_txt.resize(4);
+		times_str[0] = "Algoritmo\t\t\tTiempo";
+
+		times_str[1] = "DFS\t\t\t " + to_string(times["DFS"]);
+		times_str[2] = "BFS\t\t\t " + to_string(times["BFS"]);
+		times_str[3] = "Dijkstra\t\t" + to_string(times["Dijkstra"]);
+
+		for (int i = 0, j = 0; i < times_str.size(); i++, j = j + 1.5) {
+			times_txt[i].setFont(font_2);
+			times_txt[i].setString(times_str[i]);
+			times_txt[i].setCharacterSize(15);
+			times_txt[i].setPosition(width / 2 - 5 * NODE_SIZE, 150 + (5 + j) * NODE_SIZE);
+		}
+
+	}
+
 	void changeDynamicText(int index, double t) {
 
 		switch (index){
@@ -208,6 +245,10 @@ public:
 		help_w = c;
 	}
 
+	void activate_comparison_table(bool c) {
+		comparison_t = c;
+	}
+
 	void draw() {
 
 		window.draw(b_menu);
@@ -230,10 +271,20 @@ public:
 			window.draw(text_8);
 		}
 
+		if (comparison_t) {
+			setTextComparison();
+			window.draw(b_table);
+			window.draw(text_9);
+			for_each(times_txt.begin(), times_txt.end(), [=](Text x) {window.draw(x); });
+		}
+
 		window.display();
 
 	}
 
+	void append(string algoritmo, double time) {
+		times[algoritmo] = time;
+	}
 
 };
 
