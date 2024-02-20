@@ -5,6 +5,7 @@
 
 **menu.h:**
 
+
 **grid.h**
 
 
@@ -19,10 +20,12 @@
 
 - Implementar varios patrones de diseño
 
+- resize 
+
 - Usar hilos
 
--Video
+- Video
 
--Demo
+- Demo
 
--Readme
+- Readme
