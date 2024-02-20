@@ -18,6 +18,7 @@ class Screen {
 private:
 	RenderWindow window;
 	bool help_window = false;
+	bool comparison_table = false;
 	bool selected_alg = false;
 public:
 
@@ -51,6 +52,13 @@ public:
 					if (event.type == Event::KeyPressed) {
 						help_window = false;
 						menu.activate_help_window(help_window);
+					}
+				}
+
+				else if (comparison_table) {
+					if (event.type == Event::KeyPressed) {
+						comparison_table = false;
+						menu.activate_comparison_table(comparison_table);
 					}
 				}
 
@@ -102,7 +110,7 @@ public:
 							selected_alg = false; // está todo limpio y no se muestra nada en pantalla
 						}
 
-						if (event.key.code >= Keyboard::Num1 && event.key.code <= Keyboard::Num3) {
+						if (event.key.code >= Keyboard::Num1 && event.key.code <= Keyboard::Num4) {
 							
 							if (grid.isBegin() == false || grid.isEnd() == false) {
 								menu.changeDynamicText(1, 0); // 1: No begin or end
@@ -132,6 +140,48 @@ public:
 									menu.updateSelector(3);
 									menu.changeDynamicText(4, 0); // 4. executing bfs
 									grid.setAlgorithm(3);
+								}
+								
+								else if (event.key.code == Keyboard::Num4) {
+
+									// dijkstra
+									menu.updateSelector(1);
+									menu.changeDynamicText(2, 0);
+									grid.setAlgorithm(1);
+									grid.dijkstra(menu);
+									menu.changeDynamicText(5, grid.getTime());
+
+									menu.append("Dijkstra", grid.getTime());
+									grid.partial_clean(3);
+
+									// dfs
+
+									menu.updateSelector(2);
+									menu.changeDynamicText(3, 0); // 3. executing dfs
+									grid.setAlgorithm(2);
+									grid.dfs(menu);
+									menu.changeDynamicText(6, grid.getTime());
+
+									menu.append("DFS", grid.getTime());
+									grid.partial_clean(3);
+
+									// bfs
+
+									menu.updateSelector(3);
+									menu.changeDynamicText(4, 0); // 4. executing bfs
+									grid.setAlgorithm(3);
+									grid.bfs(menu);
+									menu.changeDynamicText(7, grid.getTime());
+
+									menu.append("BFS", grid.getTime());
+
+									// pop-up
+
+									comparison_table = true;
+									menu.activate_comparison_table(comparison_table);
+
+									selected_alg = true;
+
 								}
 							
 							}
