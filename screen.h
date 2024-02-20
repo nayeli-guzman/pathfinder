@@ -20,9 +20,20 @@ private:
 	bool help_window = false;
 	bool comparison_table = false;
 	bool selected_alg = false;
+
+	static Screen* instancia;
+	Screen() {}
+
 public:
 
-	Screen(){}
+	
+
+	static Screen* getInstance() {
+		if (instancia == nullptr)
+			instancia = new Screen;
+		return instancia;
+	}
+
 
 	void execute() {
 
