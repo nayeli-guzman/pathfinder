@@ -45,6 +45,8 @@ private:
 	Tuple prior;
 	bool dijkstra = false;
 
+	int rows, cols;
+
 	int node_size;
 
 public:
@@ -200,10 +202,10 @@ public:
 			dijkstra = true; // cada nodo está ejecutando dijkstra
 			// las paredes no pueden ser vecinos
 			if (x > 0 && grid[x - 1][y].type != 'W') v_n.push_back(Tuple(x - 1, y));
-			if (x < (COLS - 1) && grid[x + 1][y].type != 'W') v_n.push_back(Tuple(x + 1, y));
+			if (x < (cols - 1) && grid[x + 1][y].type != 'W') v_n.push_back(Tuple(x + 1, y));
 
 			if (y > 0 && grid[x][y - 1].type != 'W') v_n.push_back(Tuple(x, y - 1));
-			if (y < (ROWS - 1) && grid[x][y + 1].type != 'W') v_n.push_back(Tuple(x, y + 1));
+			if (y < (rows - 1) && grid[x][y + 1].type != 'W') v_n.push_back(Tuple(x, y + 1));
 
 		}
 
@@ -264,6 +266,14 @@ public:
 
 	void setIsEnd(bool c) {
 		is_end = c;
+	}
+
+	void setRows(int c) {
+		rows = c;
+	}
+	
+	void setCols(int c) {
+		cols = c;
 	}
 
 	// getters
