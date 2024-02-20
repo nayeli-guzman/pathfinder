@@ -19,11 +19,11 @@ private:
 	int rows, cols;
 	RenderWindow& window;
 	Node** grid;
-	Tuple start_tuple, end_tuple;
+	Tuple start_tuple, end_tuple ;
 	bool start = false, end = false;
 
 	int number_of_algorithm = 0;
-	double time;
+	double time = 0;
 
 
 	// dijkstra
@@ -33,7 +33,7 @@ private:
 		, v = false
 		, is_dijkstra = false
 		, target_node = false
-		;
+	;
 
 	// dfs
 
@@ -52,7 +52,7 @@ public:
 
 		}
 
-		generateMazeDFS();
+		//generateMazeDFS();
 
 	}
 
@@ -61,8 +61,6 @@ public:
 			for (int y = 0; y < rows; y++)
 				grid[x][y].draw(window);
 	}
-
-
 
 	// setters
 
@@ -83,7 +81,7 @@ public:
 			start_tuple = t;
 			start = true; // ahora sí hay un start
 		}
-
+		
 	}
 
 	void setEnd(Tuple t) {
@@ -161,7 +159,16 @@ public:
 				if (grid[x][y].getType() != 'W')
 					grid[x][y].total_clean();
 
+		start = false;
+		end = false;
+
+		start_tuple.x = -1;
+		start_tuple.y = -1;
+		end_tuple.x = -1;
+		end_tuple.y = -1;
+
 		while (!queued_nodes.empty()) queued_nodes.pop();
+
 	}
 
 	void partial_clean(int i) { // no limpia fin
@@ -171,16 +178,29 @@ public:
 				if (grid[x][y].getType() != 'W')
 					grid[x][y].partial_clean();
 
-		if (i == 1) {
+		if (i == 1) { // limpia todo menos el fin
 
-			grid[start_tuple.x][start_tuple.y].setIsStart(false);
+			grid[start_tuple.x][start_tuple.y].setIsStart(false); // verificar la tupla que almacenan
 			grid[end_tuple.x][end_tuple.y].setType('T');
+			start_tuple.x = -1;
+			start_tuple.y = -1;
+			start = false;
 
 		}
 
-		else if (i == 2) {
+		else if (i == 2) { // limpia todo menos el inicio
 
 			grid[end_tuple.x][end_tuple.y].setIsEnd(false);
+			grid[start_tuple.x][start_tuple.y].setType('B');
+			end_tuple.x = -1;
+			end_tuple.y = -1;
+			end = false;
+
+		}
+
+		else if (i == 3) { // limpia todo menos el inicio y fin
+
+			grid[end_tuple.x][end_tuple.y].setType('T');
 			grid[start_tuple.x][start_tuple.y].setType('B');
 
 		}
@@ -196,6 +216,8 @@ public:
 	// dijkstra
 
 	void dijkstra(Menu menu) {
+
+		auto t_begin = high_resolution_clock::now();
 
 		set_neighbors();
 
@@ -215,13 +237,15 @@ public:
 				grid[temp.x][temp.y].setType('X');
 				draw();
 				menu.draw();
-				sleep(sf::milliseconds(3));
+				sleep(sf::milliseconds(0.1));
 			}
-
-
+			
+			
 
 			queued_nodes.front().setVisited(true); // para verificar si se puso en la cola
 			queued_nodes.pop();
+
+			// pintando el camino
 
 			if (temp == end_tuple) {
 
@@ -230,8 +254,16 @@ public:
 				Tuple p = grid[temp.x][temp.y].getPrior();
 
 				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
-					//path.push_back(grid[p.x][p.y]);
-					grid[p.x][p.y].setType('P');
+					//grid[p.x][p.y].setType('P');
+					
+
+					if (p != start_tuple && p != end_tuple) {
+						grid[p.x][p.y].setType('P');
+						draw();
+						menu.draw();
+						sleep(sf::milliseconds(0.1));
+					}
+
 					p = grid[p.x][p.y].getPrior();
 
 				}
@@ -242,7 +274,7 @@ public:
 				for (auto t_n : grid[temp.x][temp.y].get_n()) { // iterando en los vecinos del nodo
 					if (!grid[t_n.x][t_n.y].getQueued()) { // para verificar si ese vecino ya ha sido visitado
 						grid[t_n.x][t_n.y].setQueued(true);
-
+						
 						grid[t_n.x][t_n.y].setPrior(temp);
 						queued_nodes.push(grid[t_n.x][t_n.y]);
 
@@ -251,18 +283,163 @@ public:
 							grid[t_n.x][t_n.y].setType('Q');
 							draw();
 							menu.draw();
-							sleep(sf::milliseconds(3));
+							sleep(sf::milliseconds(0.1));
 						}
+						
+						
+					}
+				}
+			}
+			// falta cuando no hay solución
+		}
 
+		auto t_end = high_resolution_clock::now();
+
+		duration<double, milli> t = t_end - t_begin;
+
+		time = t.count();
+
+
+
+	}
+
+	// dfs
+
+	void dfs(Menu menu) {
+
+		auto t_begin = high_resolution_clock::now();
+
+		set_neighbors();
+
+		stack<Tuple> stack_nodes;
+
+		grid[start_tuple.x][start_tuple.y].setVisited(true);
+		stack_nodes.push(start_tuple);
+
+		while (!stack_nodes.empty()) {
+			Tuple current_tuple = stack_nodes.top();
+			stack_nodes.pop();
+
+			if (current_tuple == end_tuple) {
+				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
+				while (p != start_tuple) {
+
+					if (p != start_tuple && p != end_tuple) {
+						grid[p.x][p.y].setType('P');
+						draw();
+						menu.draw();
+						sleep(sf::milliseconds(0.1));
+					}
+
+					p = grid[p.x][p.y].getPrior();
+				}
+				break;
+			}
+
+			if (current_tuple != start_tuple && current_tuple != end_tuple) {
+				grid[current_tuple.x][current_tuple.y].setType('X');
+				draw(); // Dibuja el estado actual
+				menu.draw();
+				sleep(sf::milliseconds(0.1));
+			}
+
+			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
+				if (!grid[neighbor.x][neighbor.y].getVisited()) {
+					grid[neighbor.x][neighbor.y].setVisited(true);
+					grid[neighbor.x][neighbor.y].setPrior(current_tuple);
+					stack_nodes.push(neighbor);
+
+					if (neighbor != start_tuple && neighbor != end_tuple) {
+						grid[neighbor.x][neighbor.y].setType('Q'); // Establecer tipo como 'Q'
+						draw();
+						menu.draw();
+						sleep(sf::milliseconds(0.1));
 					}
 				}
 			}
 		}
 
-		grid[start_tuple.x][start_tuple.y].setType('B');
+		auto t_end = high_resolution_clock::now();
+
+		duration<double, milli> t = t_end - t_begin;
+
+		time = t.count();
+
 
 	}
 
+	// bfs
+
+	void bfs(Menu menu) {
+
+		auto t_begin = high_resolution_clock::now();
+
+		// Configurar vecinos
+		set_neighbors();
+
+		// Inicializar la cola para BFS
+		queue<Tuple> queue_nodes;
+
+		// Marcar el nodo inicial como visitado y agregarlo a la cola
+		grid[start_tuple.x][start_tuple.y].setVisited(true);
+		queue_nodes.push(start_tuple);
+
+		// Bucle principal de BFS
+		while (!queue_nodes.empty()) {
+			Tuple current_tuple = queue_nodes.front();
+			queue_nodes.pop();
+
+			if (current_tuple == end_tuple) {
+				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
+				while (p != start_tuple) {
+
+					if (p != start_tuple && p != end_tuple) {
+						grid[p.x][p.y].setType('P');
+						draw();
+						menu.draw();
+						sleep(sf::milliseconds(0.1));
+					}
+
+					p = grid[p.x][p.y].getPrior();
+				}
+				break;
+			}
+
+			if (current_tuple != start_tuple && current_tuple != end_tuple) {
+				grid[current_tuple.x][current_tuple.y].setType('X');
+				draw(); // Dibuja el estado actual
+				menu.draw();
+				sleep(sf::milliseconds(3));
+			}
+
+			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
+				if (!grid[neighbor.x][neighbor.y].getVisited()) {
+					grid[neighbor.x][neighbor.y].setVisited(true);
+					grid[neighbor.x][neighbor.y].setPrior(current_tuple);
+					queue_nodes.push(neighbor);
+
+					if (neighbor != start_tuple && neighbor != end_tuple) {
+						grid[neighbor.x][neighbor.y].setType('Q'); // Establecer tipo como 'Q'
+						draw();
+						menu.draw();
+						sleep(sf::milliseconds(3));
+					}
+				}
+			}
+		}
+
+
+		auto t_end = high_resolution_clock::now();
+
+		duration<double, milli> t = t_end - t_begin;
+
+		time = t.count();
+	}
+
+	// - - - - - - - - - - - - - - - -
+
+	// tiempos
+	/*
 	void dijkstra_time() {
 
 		// tiempos
@@ -314,68 +491,56 @@ public:
 
 	}
 
-	void dfs(Menu menu) {
-
+	void dfs_time() {
 		// Iniciar temporizador
 		auto t_begin = high_resolution_clock::now();
 
-
+		// Configurar vecinos
 		set_neighbors();
 
+		// Inicializar la pila para DFS
 		stack<Tuple> stack_nodes;
 
-		grid[start_tuple.x][start_tuple.y].setVisited(true);
+		// Marcar el nodo inicial como visitado y agregarlo a la pila
+		grid[start_tuple.x][start_tuple.y].setVisited(true); // modifying nodos
 		stack_nodes.push(start_tuple);
 
+		// Bucle principal de DFS
 		while (!stack_nodes.empty()) {
+			// Extraer el nodo de la cima de la pila
 			Tuple current_tuple = stack_nodes.top();
 			stack_nodes.pop();
 
+			// Si es el nodo final, marcar como encontrado y detener la búsqueda
 			if (current_tuple == end_tuple) {
 				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
-				while (p != start_tuple) {
-					grid[p.x][p.y].setType('P');
+				while ((p != start_tuple)) {
 					p = grid[p.x][p.y].getPrior();
 				}
 				break;
 			}
 
-			if (current_tuple != start_tuple && current_tuple != end_tuple) {
-				grid[current_tuple.x][current_tuple.y].setType('X');
-				draw(); // Dibuja el estado actual
-				menu.draw();
-				sleep(sf::milliseconds(3));
-			}
 
+			// Explorar los vecinos del nodo actual
 			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
 				if (!grid[neighbor.x][neighbor.y].getVisited()) {
+					// Marcar el vecino como visitado y agregarlo a la pila
 					grid[neighbor.x][neighbor.y].setVisited(true);
 					grid[neighbor.x][neighbor.y].setPrior(current_tuple);
 					stack_nodes.push(neighbor);
-
-					if (neighbor != start_tuple && neighbor != end_tuple) {
-						grid[neighbor.x][neighbor.y].setType('Q'); // Establecer tipo como 'Q'
-						draw();
-						menu.draw();
-						sleep(sf::milliseconds(3));
-					}
 				}
 			}
 		}
 
-		grid[start_tuple.x][start_tuple.y].setType('B');
+
 
 		// Detener temporizador y calcular el tiempo transcurrido
 		auto t_end = high_resolution_clock::now();
 		duration<double, milli> t = t_end - t_begin;
 		time = t.count();
-
 	}
 
-
-
-	void bfs(Menu menu) {
-
+	void bfs_time() {
 		// Iniciar temporizador
 		auto t_begin = high_resolution_clock::now();
 
@@ -391,51 +556,39 @@ public:
 
 		// Bucle principal de BFS
 		while (!queue_nodes.empty()) {
+			// Extraer el nodo de la parte delantera de la cola
 			Tuple current_tuple = queue_nodes.front();
 			queue_nodes.pop();
 
+			// Si es el nodo final, marcar como encontrado y detener la búsqueda
 			if (current_tuple == end_tuple) {
 				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
-				while (p != start_tuple) {
-					grid[p.x][p.y].setType('P');
+				while ((p != start_tuple)) {
 					p = grid[p.x][p.y].getPrior();
 				}
 				break;
 			}
 
-			if (current_tuple != start_tuple && current_tuple != end_tuple) {
-				grid[current_tuple.x][current_tuple.y].setType('X');
-				draw(); // Dibuja el estado actual
-				menu.draw();
-				sleep(sf::milliseconds(3));
-			}
-
+			// Explorar los vecinos del nodo actual
 			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
 				if (!grid[neighbor.x][neighbor.y].getVisited()) {
+					// Marcar el vecino como visitado y agregarlo a la cola
 					grid[neighbor.x][neighbor.y].setVisited(true);
 					grid[neighbor.x][neighbor.y].setPrior(current_tuple);
 					queue_nodes.push(neighbor);
-
-					if (neighbor != start_tuple && neighbor != end_tuple) {
-						grid[neighbor.x][neighbor.y].setType('Q'); // Establecer tipo como 'Q'
-						draw();
-						menu.draw();
-						sleep(sf::milliseconds(3));
-					}
 				}
 			}
 		}
 
-		grid[start_tuple.x][start_tuple.y].setType('B');
 
+		// Detener temporizador y calcular el tiempo transcurrido
 		auto t_end = high_resolution_clock::now();
 		duration<double, milli> t = t_end - t_begin;
 		time = t.count();
 	}
+	*/
 
-
-
-
+	// stuff
 
 	void set_neighbors() {
 
@@ -482,7 +635,7 @@ public:
 				// Agregar el vecino a la pila
 				stack.push(neighbor);
 				stack.push(current); // Agregar el nodo actual nuevamente a la 
-				//pila para continuar con su exploración
+									 //pila para continuar con su exploración
 			}
 		}
 	}
@@ -503,6 +656,7 @@ public:
 
 		return neighbors;
 	}
+
 
 
 };
