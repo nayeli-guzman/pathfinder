@@ -32,7 +32,7 @@ private:
 	Node** grid;
 	char type;
 	Tuple tuple;
-	int x, y;
+	int x, y, number_grid = 2;
 
 
 	vector<Tuple> v_n; // para almacenar los vecinos del nodo
@@ -45,20 +45,35 @@ private:
 	Tuple prior;
 	bool dijkstra = false;
 
+	int node_size;
+
 public:
 
 	Node(){}
 
-	Node(Tuple t, char _t) {
+	Node(Tuple t, char _t, int number) {
+
+		number_grid = number;
 
 		tuple = t;
 		x = t.x;
 		y = t.y;
 
 		square = new Sprite();
-		square->setPosition(t.x * NODE_SIZE
-							, t.y * NODE_SIZE + HEADER_HEIGHT
-							);
+
+		switch (number_grid) {
+			case 1:
+				node_size = 32;
+				break;
+			case 2:
+				node_size = 40;
+				break;
+		}
+		
+		square->setPosition(t.x * node_size
+						    , t.y * node_size + HEADER_HEIGHT
+		);
+
 		image = new Texture();
 		type = _t;	
 		
@@ -66,21 +81,60 @@ public:
 
 	void animation(Tuple t, char _t) {
 
-		// necesario ??
-		square = new Sprite();
-		square->setPosition(t.x * NODE_SIZE
-							, t.y * NODE_SIZE + HEADER_HEIGHT
-						);
-		image = new Texture();
-
-		// probar luego
-
 		type = _t;
-		filterImages();
+
+		switch (number_grid) {
+		case 1:
+			filterImages_x32();
+			break;
+		case 2:
+			filterImages_x40();
+			break;
+		}
+		
 
 	}
 
-	void filterImages() {
+	void filterImages_x32() {
+
+		switch (type) {
+		case 'E': // empty
+			image->loadFromFile("sprites/x32/empty_sprite.png");
+			square->setTexture(*image);
+			break;
+		case 'W': // wall
+			image->loadFromFile("sprites/x32/wall_sprite.png");
+			square->setTexture(*image);
+			break;
+		case 'P': // path
+			image->loadFromFile("sprites/x32/path_sprite.png");
+			square->setTexture(*image);
+			break;
+		case 'X': // explored
+			image->loadFromFile("sprites/x32/explored_sprite.png");
+			square->setTexture(*image);
+			break;
+		case 'Q': // en cola
+			image->loadFromFile("sprites/x32/queued_sprite.png");
+			square->setTexture(*image);
+			break;
+		case 'B': // begin
+			image->loadFromFile("sprites/x32/start_sprite.png");
+			square->setTexture(*image);
+			break;
+		case 'T': // end
+			image->loadFromFile("sprites/x32/end_sprite.png");
+			square->setTexture(*image);
+			break;
+		
+		default:
+			break;
+		}
+
+		
+	}
+
+	void filterImages_x40() {
 
 		switch (type) {
 		case 'E': // empty
@@ -111,16 +165,25 @@ public:
 			image->loadFromFile("sprites/end_sprite.png");
 			square->setTexture(*image);
 			break;
-		
+
 		default:
 			break;
 		}
 
-		
+
 	}
 
 	void draw(RenderWindow& w) {
-		filterImages();
+		switch (number_grid) {
+		case 1:
+			filterImages_x32();
+			break;
+		case 2:
+			filterImages_x40();
+			break;
+		}
+
+		
 		w.draw(*square);
 		
 	}
