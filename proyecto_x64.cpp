@@ -1,17 +1,16 @@
 
 #include "screen.h"
+#include <ctime>
 
 Screen* Screen::instancia = nullptr;
 
 int main()
 {
-    //srand(time(nullptr));
+    srand(time(nullptr));
 
-    Screen *screen = Screen::getInstance();
+    cout << "Cargando el laberinto...";
+
+    Screen* screen = Screen::getInstance();
     screen->execute();
 
-    /*
-    Screen screen;
-    screen.execute();
-    */
 }
