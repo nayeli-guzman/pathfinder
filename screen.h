@@ -9,6 +9,8 @@
 #include "grid.h"
 #include "menu.h"
 #include <vector>
+#include <thread>
+
 
 using namespace std;
 using namespace sf;
@@ -148,7 +150,23 @@ public:
                                         small_grid.setAlgorithm(1);
                                         small_grid.dijkstra(menu);
                                         Node** temp = grid.get_Grid();
-                                        Times[0] = small_grid.dfs_time(temp);
+                                        thread dijkstra_thread([&]() {
+                                            Times[0] = small_grid.dijkstra_time(temp);
+                                            });
+
+                                        thread dfs_thread([&]() {
+                                            Times[1] = small_grid.dfs_time(temp);
+                                            });
+
+                                        thread bfs_thread([&]() {
+                                            Times[2] = small_grid.bfs_time(temp);
+                                            });
+
+                                        // Esperar a que todos los hilos terminen antes de continuar
+                                        dijkstra_thread.join();
+                                        dfs_thread.join();
+                                        bfs_thread.join();
+
                                         menu.changeDynamicText(5, Times[0]);
                                         menu.append("Dijkstra", Times[0]);
                                         small_grid.partial_clean(3);
@@ -156,7 +174,6 @@ public:
                                         menu.changeDynamicText(3, 0);
                                         small_grid.setAlgorithm(2);
                                         small_grid.dfs(menu);
-                                        Times[1] = small_grid.dfs_time(temp);
                                         menu.changeDynamicText(6, Times[1]);
                                         menu.append("DFS", Times[1]);
                                         small_grid.partial_clean(3);
@@ -164,7 +181,6 @@ public:
                                         menu.changeDynamicText(4, 0);
                                         small_grid.setAlgorithm(3);
                                         small_grid.bfs(menu);
-                                        Times[2] = small_grid.dfs_time(temp);
                                         menu.changeDynamicText(7, Times[2]);
                                         menu.append("BFS", Times[2]);
                                         comparison_table = true;
@@ -208,7 +224,22 @@ public:
                                         grid.setAlgorithm(1);
                                         grid.dijkstra(menu);
                                         Node** temp = grid.get_Grid();
-                                        Times[0] = grid.dijkstra_time(temp);
+                                        thread dijkstra_thread([&]() {
+                                            Times[0] = grid.dijkstra_time(temp);
+                                            });
+
+                                        thread dfs_thread([&]() {
+                                            Times[1] = grid.dfs_time(temp);
+                                            });
+
+                                        thread bfs_thread([&]() {
+                                            Times[2] = grid.bfs_time(temp);
+                                            });
+
+                                        // Esperar a que todos los hilos terminen antes de continuar
+                                        dijkstra_thread.join();
+                                        dfs_thread.join();
+                                        bfs_thread.join();
                                         menu.changeDynamicText(5, Times[0]);
                                         menu.append("Dijkstra", Times[0]);
                                         grid.partial_clean(3);
@@ -216,7 +247,6 @@ public:
                                         menu.changeDynamicText(3, 0);
                                         grid.setAlgorithm(2);
                                         grid.dfs(menu);
-                                        Times[1] = grid.dfs_time(temp);
                                         menu.changeDynamicText(6, Times[1]);
                                         menu.append("DFS", Times[1]);
                                         grid.partial_clean(3);
@@ -224,7 +254,6 @@ public:
                                         menu.changeDynamicText(4, 0);
                                         grid.setAlgorithm(3);
                                         grid.bfs(menu);
-                                        Times[2] = grid.dfs_time(temp);
                                         menu.changeDynamicText(7, Times[2]);
                                         menu.append("BFS", Times[2]);
                                         comparison_table = true;
