@@ -10,11 +10,8 @@
 
 **en todos los .h**
 
-- arreglo de ciertos errores
 
-- ya está implementado lo del 4, solo me falta darle un poco de formato (size del texto, y posición dentro del background)
-
-- si hay algun error ponlo aquí por fa 
+- si hay algun error ponlo aquí porfa 
 
 **Observaciones/Falta:**
 
@@ -24,11 +21,9 @@
 
 - Crear un mapa (Del mismo laberinto borrar algunas walls)
 
-- Implementar varios patrones de diseño
+- **Implementar varios patrones de diseño**
 
 - resize 
-
-- Usar hilos
 
 - Video
 
