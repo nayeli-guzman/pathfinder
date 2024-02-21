@@ -19,7 +19,7 @@ private:
 	int rows, cols, number_grid = 2;
 	RenderWindow& window;
 	Node** grid;
-	Tuple start_tuple, end_tuple ;
+	Tuple start_tuple, end_tuple;
 	bool start = false, end = false;
 
 	int number_of_algorithm = 0;
@@ -33,7 +33,7 @@ private:
 		, v = false
 		, is_dijkstra = false
 		, target_node = false
-	;
+		;
 
 	// dfs
 
@@ -87,7 +87,7 @@ public:
 			start_tuple = t;
 			start = true; // ahora sí hay un start
 		}
-		
+
 	}
 
 	void setNumberGrid(int t) {
@@ -142,6 +142,10 @@ public:
 
 	double getTime() {
 		return time;
+	}
+
+	Node** get_Grid() {
+		return grid;
 	}
 
 	// limpieza
@@ -227,12 +231,10 @@ public:
 
 	void dijkstra(Menu menu) {
 
-		auto t_begin = high_resolution_clock::now();
 
 		set_neighbors();
 
 		bool searching = true;
-
 		grid[start_tuple.x][start_tuple.y].setIsStart(true);
 		grid[start_tuple.x][start_tuple.y].setQueued(true); // en cola
 
@@ -249,8 +251,8 @@ public:
 				menu.draw();
 				sleep(sf::milliseconds(0.1));
 			}
-			
-			
+
+
 
 			queued_nodes.front().setVisited(true); // para verificar si se puso en la cola
 			queued_nodes.pop();
@@ -265,7 +267,7 @@ public:
 
 				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
 					//grid[p.x][p.y].setType('P');
-					
+
 
 					if (p != start_tuple && p != end_tuple) {
 						grid[p.x][p.y].setType('P');
@@ -284,7 +286,7 @@ public:
 				for (auto t_n : grid[temp.x][temp.y].get_n()) { // iterando en los vecinos del nodo
 					if (!grid[t_n.x][t_n.y].getQueued()) { // para verificar si ese vecino ya ha sido visitado
 						grid[t_n.x][t_n.y].setQueued(true);
-						
+
 						grid[t_n.x][t_n.y].setPrior(temp);
 						queued_nodes.push(grid[t_n.x][t_n.y]);
 
@@ -295,19 +297,12 @@ public:
 							menu.draw();
 							sleep(sf::milliseconds(0.1));
 						}
-						
-						
+
+
 					}
 				}
 			}
-			// falta cuando no hay solución
 		}
-
-		auto t_end = high_resolution_clock::now();
-
-		duration<double, milli> t = t_end - t_begin;
-
-		time = t.count();
 
 
 
@@ -316,8 +311,6 @@ public:
 	// dfs
 
 	void dfs(Menu menu) {
-
-		auto t_begin = high_resolution_clock::now();
 
 		set_neighbors();
 
@@ -369,12 +362,6 @@ public:
 			}
 		}
 
-		auto t_end = high_resolution_clock::now();
-
-		duration<double, milli> t = t_end - t_begin;
-
-		time = t.count();
-
 
 	}
 
@@ -382,13 +369,12 @@ public:
 
 	void bfs(Menu menu) {
 
-		auto t_begin = high_resolution_clock::now();
-
 		// Configurar vecinos
 		set_neighbors();
 
 		// Inicializar la cola para BFS
 		queue<Tuple> queue_nodes;
+
 
 		// Marcar el nodo inicial como visitado y agregarlo a la cola
 		grid[start_tuple.x][start_tuple.y].setVisited(true);
@@ -439,20 +425,17 @@ public:
 		}
 
 
-		auto t_end = high_resolution_clock::now();
 
-		duration<double, milli> t = t_end - t_begin;
 
-		time = t.count();
 	}
 
 	// - - - - - - - - - - - - - - - -
 
 	// tiempos
-	/*
-	void dijkstra_time() {
 
-		// tiempos
+	double dijkstra_time(Node** grid) {
+
+		resetMazeFalseAndPaint();
 
 		auto t_begin = high_resolution_clock::now();
 
@@ -466,10 +449,14 @@ public:
 		queued_nodes.push(grid[start_tuple.x][start_tuple.y]);
 
 		while (!queued_nodes.empty() && searching) {
+			// cuando entra a este bucle es pq está siendo visitado
 
 			Tuple temp = queued_nodes.front().getTuple();
-			queued_nodes.front().setQueued(true); // para verificar si se puso en la cola
+
+			queued_nodes.front().setVisited(true); // para verificar si se puso en la cola
 			queued_nodes.pop();
+
+			// pintando el camino
 
 			if (temp == end_tuple) {
 
@@ -478,16 +465,19 @@ public:
 
 				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
 					p = grid[p.x][p.y].getPrior();
+
 				}
 
 			}
 			else {
 
 				for (auto t_n : grid[temp.x][temp.y].get_n()) { // iterando en los vecinos del nodo
-					if (!grid[t_n.x][t_n.y].getVisited()) { // para verificar si ese vecino ya ha sido visitado
-						grid[t_n.x][t_n.y].setVisited(true);
+					if (!grid[t_n.x][t_n.y].getQueued()) { // para verificar si ese vecino ya ha sido visitado
+						grid[t_n.x][t_n.y].setQueued(true);
+
 						grid[t_n.x][t_n.y].setPrior(temp);
 						queued_nodes.push(grid[t_n.x][t_n.y]);
+
 					}
 				}
 			}
@@ -498,43 +488,42 @@ public:
 		duration<double, milli> t = t_end - t_begin;
 
 		time = t.count();
+		resetMazeFalseAndPaint();
+		return time;
+
 
 	}
 
-	void dfs_time() {
-		// Iniciar temporizador
+
+	double dfs_time(Node** grid) {
+
+		resetMazeFalseAndPaint();
+
+
 		auto t_begin = high_resolution_clock::now();
 
-		// Configurar vecinos
 		set_neighbors();
 
-		// Inicializar la pila para DFS
 		stack<Tuple> stack_nodes;
 
-		// Marcar el nodo inicial como visitado y agregarlo a la pila
-		grid[start_tuple.x][start_tuple.y].setVisited(true); // modifying nodos
+		grid[start_tuple.x][start_tuple.y].setVisited(true);
 		stack_nodes.push(start_tuple);
 
-		// Bucle principal de DFS
 		while (!stack_nodes.empty()) {
-			// Extraer el nodo de la cima de la pila
 			Tuple current_tuple = stack_nodes.top();
 			stack_nodes.pop();
 
-			// Si es el nodo final, marcar como encontrado y detener la búsqueda
 			if (current_tuple == end_tuple) {
 				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
-				while ((p != start_tuple)) {
+				while (p != start_tuple) {
+
 					p = grid[p.x][p.y].getPrior();
 				}
 				break;
 			}
 
-
-			// Explorar los vecinos del nodo actual
 			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
 				if (!grid[neighbor.x][neighbor.y].getVisited()) {
-					// Marcar el vecino como visitado y agregarlo a la pila
 					grid[neighbor.x][neighbor.y].setVisited(true);
 					grid[neighbor.x][neighbor.y].setPrior(current_tuple);
 					stack_nodes.push(neighbor);
@@ -542,16 +531,23 @@ public:
 			}
 		}
 
-
-
-		// Detener temporizador y calcular el tiempo transcurrido
 		auto t_end = high_resolution_clock::now();
+
 		duration<double, milli> t = t_end - t_begin;
+
 		time = t.count();
+		resetMazeFalseAndPaint();
+		return time;
+
+
 	}
 
-	void bfs_time() {
-		// Iniciar temporizador
+	// bfs
+
+	double bfs_time(Node ** grid) {
+
+		resetMazeFalseAndPaint();
+
 		auto t_begin = high_resolution_clock::now();
 
 		// Configurar vecinos
@@ -566,39 +562,36 @@ public:
 
 		// Bucle principal de BFS
 		while (!queue_nodes.empty()) {
-			// Extraer el nodo de la parte delantera de la cola
 			Tuple current_tuple = queue_nodes.front();
 			queue_nodes.pop();
 
-			// Si es el nodo final, marcar como encontrado y detener la búsqueda
 			if (current_tuple == end_tuple) {
 				Tuple p = grid[current_tuple.x][current_tuple.y].getPrior();
-				while ((p != start_tuple)) {
+				while (p != start_tuple) {
 					p = grid[p.x][p.y].getPrior();
 				}
 				break;
 			}
 
-			// Explorar los vecinos del nodo actual
 			for (auto neighbor : grid[current_tuple.x][current_tuple.y].get_n()) {
 				if (!grid[neighbor.x][neighbor.y].getVisited()) {
-					// Marcar el vecino como visitado y agregarlo a la cola
 					grid[neighbor.x][neighbor.y].setVisited(true);
 					grid[neighbor.x][neighbor.y].setPrior(current_tuple);
 					queue_nodes.push(neighbor);
+
 				}
 			}
 		}
 
 
-		// Detener temporizador y calcular el tiempo transcurrido
 		auto t_end = high_resolution_clock::now();
-		duration<double, milli> t = t_end - t_begin;
-		time = t.count();
-	}
-	*/
 
-	// stuff
+		duration<double, milli> t = t_end - t_begin;
+
+		time = t.count();
+		resetMazeFalseAndPaint();
+		return time;
+	}
 
 	void set_neighbors() {
 
@@ -608,12 +601,10 @@ public:
 			for (int y = 0; y < rows; y++)
 				grid[x][y].set_n(grid);
 
-
 	}
 
 	void generateMazeDFS() {
 		// Restablecer el laberinto
-		resetMaze();
 
 		// Crear una pila para DFS
 		stack<Node*> pila;
@@ -645,69 +636,28 @@ public:
 			}
 		}
 
-		// Verificar que no haya espacios vacíos aislados
-		//if (verificarEspaciosAislados()) {
-			//generateMazeDFS();
-		//}
 	}
 
-	void resetMaze() {
-		// Reset los nodos como Empty y false
-		for (int x = 0; x < cols; ++x) {
-			for (int y = 0; y < rows; ++y) {
-				grid[x][y].setType('E');
-				grid[x][y].setVisited(false);
-			}
-		}
-	}
+	void resetMazeFalseAndPaint() {
 
-	bool verificarEspaciosAislados() {
-		// Realizar el algoritmo de inundación para verificar espacios vacíos aislados
-		// Comenzar la inundación desde un espacio vacío aleatorio
-		int startX, startY;
-		do {
-			startX = rand() % cols;
-			startY = rand() % rows;
-		} while (grid[startX][startY].getType() != 'E'); // Encontrar un espacio vacío aleatorio
+		// fijar los vecinos de cada nodo
 
-		// Realizar la inundación desde el espacio vacío aleatorio
-		inundarEspacios(startX, startY);
+		for (int x = 0; x < cols; x++)
+			for (int y = 0; y < rows; y++)
+				if (grid[x][y].getType() != 'W') {
+					grid[x][y].setType('E');
+					grid[x][y].setVisited(false);
 
-		// Verificar si todos los espacios vacíos han sido visitados
-		for (int x = 0; x < cols; ++x) {
-			for (int y = 0; y < rows; ++y) {
-				if (grid[x][y].getType() == 'E' && !grid[x][y].getVisited()) {
-					// Se encontró un espacio vacío aislado
-					return true;
 				}
-			}
-		}
-
-		// No se encontraron espacios vacíos aislados
-		return false;
-	}
-
-	void inundarEspacios(int x, int y) {
-		// Verificar si la posición actual está dentro de los límites y es un espacio vacío no visitado
-		if (x >= 0 && x < cols && y >= 0 && y < rows && grid[x][y].getType() == 'E' && !grid[x][y].getVisited()) {
-			// Marcar el espacio actual como visitado
-			grid[x][y].setVisited(true);
-
-			// Realizar la inundación de manera recursiva en las cuatro direcciones
-			inundarEspacios(x + 1, y); // Derecha
-			inundarEspacios(x - 1, y); // Izquierda
-			inundarEspacios(x, y + 1); // Abajo
-			inundarEspacios(x, y - 1); // Arriba
-		}
+		grid[start_tuple.x][start_tuple.y].setType('B');
+		grid[end_tuple.x][end_tuple.y].setType('T');
 	}
 
 
-
-	// Función para obtener los vecinos no visitados de un nodo
 	vector<Node*> getUnvisitedNeighbors(Node* current) {
 		vector<Node*> neighbors;
 		Tuple pos = current->getTuple();
-		// pos actual 
+		// pos actual
 		int x = pos.x;
 		int y = pos.y;
 
@@ -720,66 +670,8 @@ public:
 		return neighbors;
 	}
 
-
-	/*
 	
-	void generateMazeDFS() {
-		// Elegir una posición de inicio aleatoria
-		int startX = rand() % cols;
-		int startY = rand() % rows;
 
-		// Crear una pila para realizar DFS
-		stack<Node*> stack;
-		grid[startX][startY].setType('W'); // Marcar el nodo inicial como Wall
-		stack.push(&grid[startX][startY]); // Agregar el nodo inicial a la pila
-
-		while (!stack.empty()) {
-			Node* current = stack.top();
-			stack.pop();
-
-			// Obtener los vecinos no visitados del nodo actual
-			vector<Node*> neighbors = getUnvisitedNeighbors(current);
-
-			// Si hay vecinos no visitados
-			if (!neighbors.empty()) {
-				// Escoger un vecino aleatorio
-				int randIndex = rand() % neighbors.size();
-				Node* neighbor = neighbors[randIndex];
-
-				// Marcar el vecino aleatorio como Wall
-				neighbor->setType('W');
-
-				// Marcar el espacio entre el nodo actual y el vecino como Empty
-				int x = current->getTuple().x + (neighbor->getTuple().x - current->getTuple().x) / 2;
-				int y = current->getTuple().y + (neighbor->getTuple().y - current->getTuple().y) / 2;
-				grid[x][y].setType('W');
-
-				// Agregar el vecino a la pila
-				stack.push(neighbor);
-				stack.push(current); // Agregar el nodo actual nuevamente a la 
-									 //pila para continuar con su exploración
-			}
-		}
-	}
-
-	vector<Node*> getUnvisitedNeighbors(Node* current) {
-		vector<Node*> neighbors;
-		Tuple pos = current->getTuple();
-		// pos actual 
-		int x = pos.x;
-		int y = pos.y;
-
-		// Verificar vecinos arriba, abajo, izquierda y derecha
-		if (x > 1 && grid[x - 2][y].getType() == 'E') neighbors.push_back(&grid[x - 2][y]);
-		if (x < cols - 2 && grid[x + 2][y].getType() == 'E') neighbors.push_back(&grid[x + 2][y]);
-		if (y > 1 && grid[x][y - 2].getType() == 'E') neighbors.push_back(&grid[x][y - 2]);
-		if (y < rows - 2 && grid[x][y + 2].getType() == 'E') neighbors.push_back(&grid[x][y + 2]);
-
-		return neighbors;
-	}
-	
-	*/
-	
 
 
 };
