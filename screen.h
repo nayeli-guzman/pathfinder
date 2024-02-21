@@ -149,7 +149,7 @@ public:
                                         menu.changeDynamicText(2, 0);
                                         small_grid.setAlgorithm(1);
                                         small_grid.dijkstra(menu);
-                                        Node** temp = grid.get_Grid();
+                                        Node** temp = small_grid.get_Grid();
                                         thread dijkstra_thread([&]() {
                                             Times[0] = small_grid.dijkstra_time(temp);
                                             });
@@ -269,22 +269,22 @@ public:
                                     if (!selected_alg_1) {
                                         if (small_grid.getAlgorithm() == 1) {
                                             small_grid.dijkstra(menu);
-                                            Node** temp = grid.get_Grid();
-                                            Times[0] = grid.dijkstra_time(temp);
+                                            Node** temp = small_grid.get_Grid();
+                                            Times[0] = small_grid.dijkstra_time(temp);
                                             menu.changeDynamicText(5, Times[0]);
                                             selected_alg_1 = true;
                                         }
                                         else if (small_grid.getAlgorithm() == 2) {
                                             small_grid.dfs(menu);
-                                            Node** temp = grid.get_Grid();
+                                            Node** temp = small_grid.get_Grid();
                                             Times[1] = small_grid.dfs_time(temp);
                                             menu.changeDynamicText(6, Times[1]);
                                             selected_alg_1 = true;
                                         }
                                         else if (small_grid.getAlgorithm() == 3) {
                                             small_grid.bfs(menu);
-                                            Node** temp = grid.get_Grid();
-                                            Times[2] = grid.bfs_time(temp);
+                                            Node** temp = small_grid.get_Grid();
+                                            Times[2] = small_grid.bfs_time(temp);
                                             menu.changeDynamicText(7, Times[2]);
                                             selected_alg_1 = true;
                                         }
@@ -296,23 +296,34 @@ public:
                                 if (grid.getAlgorithm() != 0 && (grid.isBegin() == true && grid.isEnd() == true)) {
                                     if (!selected_alg_2) {
                                         if (grid.getAlgorithm() == 1) {
-                                            grid.dijkstra(menu);
                                             Node** temp = grid.get_Grid();
-                                            Times[0] = grid.dijkstra_time(temp);
+                                            thread dijkstra_thread([&]() {
+                                                Times[2] = grid.dijkstra_time(temp);
+                                                });
+                                            grid.dijkstra(menu);
+                                            dijkstra_thread.join();
                                             menu.changeDynamicText(5, Times[0]);
                                             selected_alg_2 = true;
                                         }
                                         else if (grid.getAlgorithm() == 2) {
-                                            grid.dfs(menu);
                                             Node** temp = grid.get_Grid();
-                                            Times[1] = grid.dfs_time(temp);
+                                            thread dfs_thread([&]() {
+                                                Times[1] = grid.dfs_time(temp);
+                                                });
+                                            grid.dfs(menu);
+                                            dfs_thread.join();
+
                                             menu.changeDynamicText(6, Times[1]);
                                             selected_alg_2 = true;
                                         }
                                         else if (grid.getAlgorithm() == 3) {
-                                            grid.bfs(menu);
                                             Node** temp = grid.get_Grid();
-                                            Times[2] = grid.bfs_time(temp);
+                                            thread bfs_thread([&]() {
+                                                Times[2] = grid.bfs_time(temp);
+                                                });
+                                            grid.bfs(menu);
+                                            bfs_thread.join();
+
                                             menu.changeDynamicText(7, Times[2]);
                                             selected_alg_2 = true;
                                         }
