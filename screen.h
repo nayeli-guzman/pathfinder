@@ -271,7 +271,7 @@ public:
                                         if (small_grid.getAlgorithm() == 1) {
                                             Node** temp = small_grid.get_Grid();
                                             thread dijkstra_thread([&]() {
-                                                Times[1] = small_grid.dfs_time(temp);
+                                                Times[0] = small_grid.dfs_time(temp);
                                                 });
                                             small_grid.dfs(menu);
                                             dijkstra_thread.join();
@@ -291,7 +291,7 @@ public:
                                         else if (small_grid.getAlgorithm() == 3) {
                                             Node** temp = small_grid.get_Grid();
                                             thread bfs_thread([&]() {
-                                                Times[1] = small_grid.bfs_time(temp);
+                                                Times[2] = small_grid.bfs_time(temp);
                                                 });
                                             small_grid.bfs(menu);
                                             bfs_thread.join();
@@ -308,7 +308,7 @@ public:
                                         if (grid.getAlgorithm() == 1) {
                                             Node** temp = grid.get_Grid();
                                             thread dijkstra_thread([&]() {
-                                                Times[2] = grid.dijkstra_time(temp);
+                                                Times[0] = grid.dijkstra_time(temp);
                                                 });
                                             grid.dijkstra(menu);
                                             dijkstra_thread.join();
