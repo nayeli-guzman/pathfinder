@@ -236,10 +236,7 @@ public:
                                             Times[2] = grid.bfs_time(temp);
                                             });
 
-                                        // Esperar a que todos los hilos terminen antes de continuar
-                                        dijkstra_thread.join();
-                                        dfs_thread.join();
-                                        bfs_thread.join();
+
                                         menu.changeDynamicText(5, Times[0]);
                                         menu.append("Dijkstra", Times[0]);
                                         grid.partial_clean(3);
@@ -254,6 +251,10 @@ public:
                                         menu.changeDynamicText(4, 0);
                                         grid.setAlgorithm(3);
                                         grid.bfs(menu);
+                                        // Esperar a que todos los hilos terminen antes de continuar
+                                        dijkstra_thread.join();
+                                        dfs_thread.join();
+                                        bfs_thread.join();
                                         menu.changeDynamicText(7, Times[2]);
                                         menu.append("BFS", Times[2]);
                                         comparison_table = true;
@@ -268,23 +269,32 @@ public:
                                 if (small_grid.getAlgorithm() != 0 && (small_grid.isBegin() == true && small_grid.isEnd() == true)) {
                                     if (!selected_alg_1) {
                                         if (small_grid.getAlgorithm() == 1) {
-                                            small_grid.dijkstra(menu);
                                             Node** temp = small_grid.get_Grid();
-                                            Times[0] = small_grid.dijkstra_time(temp);
+                                            thread dijkstra_thread([&]() {
+                                                Times[1] = small_grid.dfs_time(temp);
+                                                });
+                                            small_grid.dfs(menu);
+                                            dijkstra_thread.join();
                                             menu.changeDynamicText(5, Times[0]);
                                             selected_alg_1 = true;
                                         }
                                         else if (small_grid.getAlgorithm() == 2) {
-                                            small_grid.dfs(menu);
                                             Node** temp = small_grid.get_Grid();
-                                            Times[1] = small_grid.dfs_time(temp);
+                                            thread dfs_thread([&]() {
+                                                Times[1] = small_grid.dfs_time(temp);
+                                                });
+                                            small_grid.dfs(menu);
+                                            dfs_thread.join();
                                             menu.changeDynamicText(6, Times[1]);
                                             selected_alg_1 = true;
                                         }
                                         else if (small_grid.getAlgorithm() == 3) {
-                                            small_grid.bfs(menu);
                                             Node** temp = small_grid.get_Grid();
-                                            Times[2] = small_grid.bfs_time(temp);
+                                            thread bfs_thread([&]() {
+                                                Times[1] = small_grid.bfs_time(temp);
+                                                });
+                                            small_grid.bfs(menu);
+                                            bfs_thread.join();
                                             menu.changeDynamicText(7, Times[2]);
                                             selected_alg_1 = true;
                                         }
