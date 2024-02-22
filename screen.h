@@ -150,9 +150,7 @@ public:
                                         small_grid.setAlgorithm(1);
                                         small_grid.dijkstra(menu);
                                         Node** temp = small_grid.get_Grid();
-                                        thread dijkstra_thread([&]() {
-                                            Times[0] = small_grid.dijkstra_time(temp);
-                                            });
+                                        Times[0] = small_grid.dijkstra_time(temp);
 
                                         thread dfs_thread([&]() {
                                             Times[1] = small_grid.dfs_time(temp);
@@ -163,7 +161,6 @@ public:
                                             });
 
                                         // Esperar a que todos los hilos terminen antes de continuar
-                                        dijkstra_thread.join();
                                         dfs_thread.join();
                                         bfs_thread.join();
 
@@ -223,10 +220,9 @@ public:
                                         menu.changeDynamicText(2, 0);
                                         grid.setAlgorithm(1);
                                         grid.dijkstra(menu);
+
                                         Node** temp = grid.get_Grid();
-                                        thread dijkstra_thread([&]() {
-                                            Times[0] = grid.dijkstra_time(temp);
-                                            });
+                                        Times[0] = grid.dijkstra_time(temp);
 
                                         thread dfs_thread([&]() {
                                             Times[1] = grid.dfs_time(temp);
@@ -252,7 +248,6 @@ public:
                                         grid.setAlgorithm(3);
                                         grid.bfs(menu);
                                         // Esperar a que todos los hilos terminen antes de continuar
-                                        dijkstra_thread.join();
                                         dfs_thread.join();
                                         bfs_thread.join();
                                         menu.changeDynamicText(7, Times[2]);
@@ -269,12 +264,9 @@ public:
                                 if (small_grid.getAlgorithm() != 0 && (small_grid.isBegin() == true && small_grid.isEnd() == true)) {
                                     if (!selected_alg_1) {
                                         if (small_grid.getAlgorithm() == 1) {
+                                            small_grid.dijkstra(menu);
                                             Node** temp = small_grid.get_Grid();
-                                            thread dijkstra_thread([&]() {
-                                                Times[0] = small_grid.dfs_time(temp);
-                                                });
-                                            small_grid.dfs(menu);
-                                            dijkstra_thread.join();
+                                            Times[0] = small_grid.dijkstra_time(temp);
                                             menu.changeDynamicText(5, Times[0]);
                                             selected_alg_1 = true;
                                         }
@@ -307,11 +299,8 @@ public:
                                     if (!selected_alg_2) {
                                         if (grid.getAlgorithm() == 1) {
                                             Node** temp = grid.get_Grid();
-                                            thread dijkstra_thread([&]() {
-                                                Times[0] = grid.dijkstra_time(temp);
-                                                });
                                             grid.dijkstra(menu);
-                                            dijkstra_thread.join();
+                                            Times[0] = grid.dijkstra_time(temp);
                                             menu.changeDynamicText(5, Times[0]);
                                             selected_alg_2 = true;
                                         }
