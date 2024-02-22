@@ -8,10 +8,7 @@
 
 **grid.h**
 
-**en todos los .h**
-
-
-- si hay algun error ponlo aquí porfa 
+- mapa de obstaculos agregado, revisar lo del laberinto
 
 **Observaciones/Falta:**
 
