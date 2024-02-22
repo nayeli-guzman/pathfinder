@@ -23,15 +23,15 @@ private:
 		, t3 = "Informacion"
 		, t4 = "Presione las siguientes teclas de acuerdo al \n\n          algoritmo que quiera ejecutar"
 		, t5 = ". . .  seleccione un algoritmo  . . ." // dynamic text
-		, t6 = "Para ejecutar el algoritmo seleccionado, usted"
-		"\n\n          debe presionar 'ESPACIO'."
-		"\n\n\n\nAntes de esto el inicio y fin deben definirse"
+		, t6 = "Para ejecutar el algoritmo seleccionado, usted" 
+				"\n\n          debe presionar 'ESPACIO'."
+				"\n\n\n\nAntes de esto el inicio y fin deben definirse"
 		, t7 = "[click] \t Inicio"
-		"\n\n[anticlick]\t Fin"
+				"\n\n[anticlick]\t Fin"
 		, t8 = "Para reiniciar el mapa y ejecutar otro algoritmo, "
-		"\n\n	debe presionar 'C' y repetir el proceso\n\n				 de seleccion"
+				"\n\n	debe presionar 'C' y repetir el proceso\n\n				 de seleccion"
 		, t9 = "Comparacion"
-
+		
 		;
 
 	map<string, double> times;
@@ -125,7 +125,7 @@ public:
 		text_5.setCharacterSize(23);
 		text_5.setPosition(width / 2 + 2 * NODE_SIZE, NODE_SIZE * 1.5);
 
-
+		
 
 	}
 
@@ -195,30 +195,30 @@ public:
 
 	void changeDynamicText(int index, double t) {
 
-		switch (index) {
-		case 1:
-			t5 = "seleccione un inicio y/o fin";
-			break;
-		case 2:
-			t5 = "ejecutando Dijkstra";
-			break;
-		case 3:
-			t5 = "ejecutando DFS";
-			break;
-		case 4:
-			t5 = "ejecutando BFS";
-			break;
-		case 5:
-			t5 = "Dijkstra tomó " + to_string(t) + " ms";
-			break;
-		case 6:
-			t5 = "DFS tomó " + to_string(t) + " ms";
-			break;
-		case 7:
-			t5 = "BFS tomó " + to_string(t) + " ms";
-			break;
-		default:
-			break;
+		switch (index){
+			case 1:
+				t5 = "seleccione un inicio y/o fin";
+				break;
+			case 2:
+				t5 = "ejecutando Dijkstra";
+				break;
+			case 3:
+				t5 = "ejecutando DFS";
+				break;
+			case 4:
+				t5 = "ejecutando BFS";
+				break;
+			case 5:
+				t5 = "Dijkstra tomó " + to_string(t) + " ms";
+				break;
+			case 6:
+				t5 = "DFS tomó " + to_string(t) + " ms";
+				break;
+			case 7:
+				t5 = "BFS tomó " + to_string(t) + " ms";
+				break;
+			default:
+				break;
 		}
 
 		text_5.setString(t5);
@@ -287,3 +287,4 @@ public:
 	}
 
 };
+
