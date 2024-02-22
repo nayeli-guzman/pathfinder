@@ -7,6 +7,7 @@
 #include <vector>
 #include "node.h"
 #include "menu.h"
+#include <thread>
 
 using namespace std;
 using namespace chrono;
@@ -639,18 +640,33 @@ public:
 	}
 
 	void resetMazeFalseAndPaint() {
+		// Obtener la mitad de las filas
+		int halfRows = rows / 2;
 
-		// fijar los vecinos de cada nodo
+		// Crear dos hilos para restablecer y pintar las dos mitades de la cuadrícula
+		thread thread1(&Grid::resetAndPaintHalf, this, 0, halfRows);
+		thread thread2(&Grid::resetAndPaintHalf, this, halfRows, rows);
 
-		for (int x = 0; x < cols; x++)
-			for (int y = 0; y < rows; y++)
+		// Esperar a que ambos hilos terminen
+		thread1.join();
+		thread2.join();
+	}
+
+	void resetAndPaintHalf(int startRow, int endRow) {
+		// Restablecer y pintar la mitad de las filas
+		for (int x = 0; x < cols; x++) {
+			for (int y = startRow; y < endRow; y++) {
 				if (grid[x][y].getType() != 'W') {
 					grid[x][y].setType('E');
 					grid[x][y].setVisited(false);
-
 				}
-		grid[start_tuple.x][start_tuple.y].setType('B');
-		grid[end_tuple.x][end_tuple.y].setType('T');
+			}
+		}
+
+			grid[start_tuple.x][start_tuple.y].setType('B');
+			grid[end_tuple.x][end_tuple.y].setType('T');
+
+
 	}
 
 
