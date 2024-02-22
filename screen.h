@@ -65,23 +65,17 @@ public:
 						Tuple<> current_pos = getTuple(); 
 
 						if (event.mouseButton.button == Mouse::Left) {
-						
 							if (number_of_map == 1)
 								setBegin(&small_grid, current_pos, selected_alg_1);
-
 							else if (number_of_map == 2)
 								setBegin(&grid, current_pos, selected_alg_2);
-
 						}
 
 						else if (event.mouseButton.button == Mouse::Right) {
-							
 							if (number_of_map == 1)
 								setEnd(&small_grid, current_pos, selected_alg_1);
-
 							else if (number_of_map == 2) 
 								setEnd(&grid, current_pos, selected_alg_2);
-
 						}
 
 					}
@@ -94,13 +88,10 @@ public:
 						}
 
 						else if (event.key.code == Keyboard::C) {
-							
 							if (number_of_map == 1)
 								totalClean(&small_grid, selected_alg_1);
-
 							else if (number_of_map == 2) 
 								totalClean(&grid, selected_alg_2);
-							
 						}
 
 						else if (event.key.code >= Keyboard::Num1 && event.key.code <= Keyboard::Num4) {
@@ -109,18 +100,16 @@ public:
 							
 								if (small_grid.isBegin() == false || small_grid.isEnd() == false) 
 									menu.changeDynamicText(1, 0); // 1: No begin or end
-								
 								else { 
-
 									if (event.key.code == Keyboard::Num1)
 										updateAlgorithm(&small_grid, &menu, selected_alg_1, 1);
-
+									
 									else if (event.key.code == Keyboard::Num2)
 										updateAlgorithm(&small_grid, &menu, selected_alg_1, 2);
-
+									
 									else if (event.key.code == Keyboard::Num3) 
 										updateAlgorithm(&small_grid, &menu, selected_alg_1, 3);
-
+									
 									else if (event.key.code == Keyboard::Num4) {
 
 										if (selected_alg_1) small_grid.partial_clean(3);
@@ -268,10 +257,8 @@ public:
 
 						else if (event.key.code == Keyboard::Up || event.key.code == Keyboard::Down) {
 
-							if (event.key.code == Keyboard::Up)
-								number_of_map = 1;
-							else
-								number_of_map = 2;
+							if (event.key.code == Keyboard::Up) number_of_map = 1;
+							else number_of_map = 2;
 
 						}
 
@@ -289,7 +276,6 @@ public:
 		}	
 
 	}
-
 	
 	Tuple<> getTuple() {
 
