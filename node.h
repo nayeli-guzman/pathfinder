@@ -9,8 +9,8 @@ template <class T = int>
 struct Tuple {
 	T x, y;
 
-	Tuple() : x(0), y(0) {}
-	Tuple(int x, int y) : x(x), y(y) {}
+	Tuple() : x(0), y(0){}
+	Tuple(T x, T y) : x(x), y(y) {}
 	Tuple(const Tuple& t2) { x = t2.x; y = t2.y; }
 
 	int get_x() { return x; }
@@ -26,7 +26,7 @@ struct Tuple {
 
 };
 
-class Node {
+class Node{
 private:
 	Sprite* square;
 	Texture* image;
@@ -42,7 +42,7 @@ private:
 		, queued = false // para verificar si el nodo está en la cola
 		, is_start = false // para verificar si el nodo es el comienzo
 		, is_end = false
-		;
+	; 
 	Tuple<> prior;
 	bool dijkstra = false;
 
@@ -50,9 +50,11 @@ private:
 
 	int node_size;
 
+	bool locked = true; // al inicio todo es wall
+
 public:
 
-	Node() {}
+	Node(){}
 
 	Node(Tuple<> t, char _t, int number) {
 
@@ -65,22 +67,24 @@ public:
 		square = new Sprite();
 
 		switch (number_grid) {
-		case 1:
-			node_size = 32;
-			break;
-		case 2:
-			node_size = 40;
-			break;
+			case 1:
+				node_size = 32;
+				break;
+			case 2:
+				node_size = 40;
+				break;
 		}
-
+		
 		square->setPosition(t.x * node_size
-			, t.y * node_size + HEADER_HEIGHT
+						    , t.y * node_size + HEADER_HEIGHT
 		);
 
 		image = new Texture();
-		type = _t;
-
+		type = _t;	
+		
 	}
+
+
 
 	void animation(Tuple<> t, char _t) {
 
@@ -94,7 +98,7 @@ public:
 			filterImages_x40();
 			break;
 		}
-
+		
 
 	}
 
@@ -129,12 +133,12 @@ public:
 			image->loadFromFile("sprites/x32/end_sprite.png");
 			square->setTexture(*image);
 			break;
-
+		
 		default:
 			break;
 		}
 
-
+		
 	}
 
 	void filterImages_x40() {
@@ -186,22 +190,22 @@ public:
 			break;
 		}
 
-
+		
 		w.draw(*square);
-
+		
 	}
 
 	// dijkstra
 
 	void set_n(Node** grid) {
 
-
+		
 		v_n.resize(0);
 
 		if (type != 'W') { // las paredes no pueden tener vecinos
 
-			dijkstra = true; // cada nodo está ejecutando dijkstra
-			// las paredes no pueden ser vecinos
+			dijkstra = true; 
+
 			if (x > 0 && grid[x - 1][y].type != 'W') v_n.push_back(Tuple<>(x - 1, y));
 			if (x < (cols - 1) && grid[x + 1][y].type != 'W') v_n.push_back(Tuple<>(x + 1, y));
 
@@ -231,17 +235,20 @@ public:
 		if (dijkstra) {
 
 			dijkstra = false; // ya no estará ejecutando dijks
-			queued = false;
+			queued = false; 
 			visited = false;
 			Tuple<> prior;
-			v_n.clear();
+			//v_n.clear();
 			type = 'E';
-
+			
 		}
 	}
 
 	// setters
 
+	void setLocked(bool c) {
+		locked = c;
+	}
 
 	void setQueued(bool c) {
 		queued = c;
@@ -253,8 +260,6 @@ public:
 
 	void setType(char c) {
 		type = c;
-
-
 	}
 
 	void setPrior(Tuple<> c) {
@@ -272,12 +277,16 @@ public:
 	void setRows(int c) {
 		rows = c;
 	}
-
+	
 	void setCols(int c) {
 		cols = c;
 	}
 
 	// getters
+
+	bool getLocked() {
+		return locked;
+	}
 
 	bool getQueued() {
 		return queued;
@@ -304,3 +313,4 @@ public:
 	}
 
 };
+
