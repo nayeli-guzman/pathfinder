@@ -20,8 +20,6 @@
 
 - **Implementar varios patrones de diseño**
 
-- Hilos para el reseteo
-
 - resize 
 
 - Video
