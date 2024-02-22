@@ -14,29 +14,17 @@ using namespace chrono;
 using namespace sf;
 
 class Grid {
-
 private:
 	RenderWindow& window;
 	Node** grid;
 	Tuple<> start_tuple, end_tuple ;
-	bool start = false, end = false;
+	bool start = false, end = false
+		, is_clean = true; // no cuenta inicio ni fin
 	int rows, cols
 		, number_grid = 2
 		, number_of_algorithm = 0;
 	double time = 0;
-
-
-	// dijkstra
 	
-	bool q = false
-		, v = false
-		, is_dijkstra = false
-		, target_node = false
-		, is_clean = true; // no cuenta inicio ni fin
-	;
-
-
-
 public:
 
 
@@ -47,9 +35,8 @@ public:
 		for (int x = 0; x < cols; x++) {
 			grid[x] = new Node[rows];
 			for (int y = 0; y < rows; y++) {
-				grid[x][y] = Node(Tuple<>(x, y), 'W', number_grid); // E empty
-				// WALL para prims algorithm, CAMBIAR A EMPTY SI NO SE VA A 
-				// EJECUTAR PRIMS_ALGORITHM
+				grid[x][y] = Node(Tuple<>(x, y), 'W', number_grid);
+				// CAMBIAR A EMPTY SI NO SE VA A EJECUTAR PRIMS_ALGORITHM
 				grid[x][y].setCols(cols);
 				grid[x][y].setRows(rows);
 			}
@@ -79,187 +66,7 @@ public:
 
 	}
 
-	// REVISAR
-
-	void maze() {
-		recursive_division(0, 0, rows, cols);
-	}
-	void recursive_division(int x, int y, int height, int width) { //16, 40
-
-		if (width < 4 || height < 4)
-			return;
-
-		int new_wall_x = 0
-			, new_wall_y = 0
-			, new_hole_x = 0
-			, new_hole_y = 0
-			, new_height = 0
-			, new_width = 0
-			, y_pair = 0
-			, x_pair = 0
-			, new_height_pair = 0
-			, new_width_pair = 0
-			;
-
-		int orientation, horizontal = 1, vertical = 0;
-
-		if (width < height)
-			orientation = horizontal;
-		else
-			orientation = vertical;
-
-		cout << endl << orientation << endl;
-
-		new_wall_x = x + (orientation ? 0 : rand() % (width - 2));
-		new_wall_y = y + (orientation ? rand() % (height - 2) : 0);
-
-		new_hole_x = new_wall_x + (orientation ? rand() % (width) : 0);
-		new_hole_y = new_wall_y + (orientation ? 0 : rand() % (height));
-
-		//cout << "nw" << new_wall_x << ", " << new_wall_y << endl;
-		//cout << "nh" << new_hole_x << ", " << new_hole_y << endl;
-
-		int lenght = (orientation) ? width : height;
-
-		int dx = (orientation) ? 1 : 0;
-		int dy = (orientation) ? 0 : 1;
-
-		int nwx = new_wall_x;
-
-		for (int i = 0; i < lenght; i++) {
-			grid[new_wall_x][new_wall_y].setType('W');
-			new_wall_x += dx;
-			new_wall_y += dy;
-		}
-
-		grid[new_hole_x][new_hole_y].setType('E');
-		
-
-		int nx = x, ny = y;
-		int w = orientation ? width : new_wall_x - x + 1
-			, h = orientation ? (new_wall_y - y + 1) : height;
-
-		cout << "1. " << h << " " << w << endl;
-
-		//recursive_division(nx, ny, w, h);
-
-		nx = horizontal ? x : (new_wall_x + 1);
-		ny = horizontal ? (new_wall_y + 1) : y;
-
-		w = horizontal ? width : (x + width - new_wall_x - 1);
-		h = horizontal ? (y + height - new_wall_y - 1) : height;
-
-		cout << "2. " << h << " " << w << endl;
-		//recursive_division(nx, ny, w, h);
-
-		
-		/*
-		SEGUNDA OPCIÓN ):
-		if (horizontal == orientation) {
-
-			if (height <= 5) 
-				return;
-			
-			
-			// Random place for the wall and for the hole. 
-
-			int random_wall = rand() % (height - 5) + 2;
-			int random_hole = rand() % (width - 3) + 1;
-
-			// Make sure, that the wall is on an even coordinate and the hole is
-			// on an odd coordinate. 
-			new_wall = y + random_wall / 2 * 2;
-			new_hole = x + random_hole / 2 * 2 + 1;
-
-			cout << "rw1: " << random_wall << endl;
-			cout << "rh1: " << random_hole << endl;
-
-			cout << "nw1: " << new_wall << endl;
-			cout << "nh1: " << new_hole << endl << endl;
-
-			// Place the wall. 
-			for (int i = x; i < (x + width - 1); i++) 
-				grid[i][new_wall].setType('W');
-			
-			// Place the hole. 
-			grid[new_hole][new_wall].setType('E');
-
-			// Calculate the new values for the next run. 
-			new_height = new_wall - y + 1;
-			new_width = width;
-
-			// Complementary pairs. 'The other side of the wall.' 
-			y_pair = new_wall;
-			x_pair = x;
-			new_height_pair = y + height - new_wall;
-			new_width_pair = width;
-
-			cout << "yp: " << y_pair<< endl;
-			cout << "xp: " << x_pair << endl;
-
-			cout << "nhp: " << new_height_pair << endl;
-			cout << "nwp: " << new_width_pair<< endl << endl;
-
-		
-		}
-		else if (vertical == orientation) {
-
-			if (width <= 5) {
-				cout << "PENE";
-				return;
-			}
-
-			int random_wall = rand() % (width - 5) + 2;
-			int random_hole = rand() % (height - 3) + 1;
-
-
-			// Make sure, that the wall is on an even coordinate and the hole is on
-			an odd coordinate. 
-			new_wall = y + random_wall / 2 * 2;
-			new_hole = x + random_hole / 2 * 2 + 1;
-
-			cout << "rw2: " << random_wall << endl;
-			cout << "rh2: " << random_hole << endl;
-
-			cout << "nw2: " << new_wall << endl;
-			cout << "nh2: " << new_hole << endl << endl;
-
-			// Place the wall. 
-			for (int i = y; i < (y + height - 1); i++) 
-				grid[new_wall][i].setType('W');
-			
-			// Place the hole. 
-			grid[new_wall][new_hole].setType('E');
-
-			// Calculate the new values for the next run. 
-			new_height = height;
-			new_width = new_wall - x + 1;
-
-			// Complementary pairs. 'The other side of the wall.' 
-			y_pair = y;
-			x_pair = new_wall;
-			new_height_pair = height;
-			new_width_pair = x + width - new_wall;
-
-
-			cout << "yp: " << y_pair << endl;
-			cout << "xp: " << x_pair << endl;
-
-			cout << "nhp: " << new_height_pair << endl;
-			cout << "nwp: " << new_width_pair << endl << endl;
-		}
-
-		recursive_division(y, x, new_height, new_width);
-		// When there are no more places left, then go to the 'other side'. 
-		recursive_division(y_pair, x_pair, new_height_pair, new_width_pair);
-		*/
-
-	}
-
-	//
-
 	void prims_algorithm() {
-
 
 		vector<Node> vecinos_bloqueados;
 		vector<Node> vecinos_desbloqueados;
@@ -274,33 +81,16 @@ public:
 		get_vecinos_bloqueados(x_r, y_r, vecinos_bloqueados); // VECINOS BLOQ DE INICIO RANDOM
 
 		while (!vecinos_bloqueados.empty()) {
-
-			
+		
 			int random1 = rand() % vecinos_bloqueados.size();
 			int x1 = vecinos_bloqueados[random1].getTuple().x;
 			int y1 = vecinos_bloqueados[random1].getTuple().y; // ID VECINO BLOQ RANDOM
-			/*
-			Node* vecino_bloq = &vecinos_bloqueados.front();
-			int x1 = vecino_bloq->getTuple().x;
-			int y1 = vecino_bloq->getTuple().y;
-			*/
+
 			get_vecinos_desbloqueados(x1, y1, vecinos_desbloqueados);
-
-
 			
 			int random2 = rand() % vecinos_desbloqueados.size();
 			int x2 = vecinos_desbloqueados[random2].getTuple().x;
 			int y2 = vecinos_desbloqueados[random2].getTuple().y; // ID VECINO DESBLOQ RANDOM
-			
-			/*
-			Node* vecino_desbloq = &vecinos_desbloqueados.top();
-			int x2 = vecino_desbloq->getTuple().x;
-			int y2 = vecino_desbloq->getTuple().y;
-			*/
-			//cout << endl << "real:" << x2 << ", " << y2 << endl;
-			//for (auto e : vecinos_desbloqueados) cout << e.getTuple().x << ", " << e.getTuple().y << endl;
-			
-			//cout << x2 << ", " << y2 << endl;
 
 			Node* temp = getMedio(grid[x1][y1].getTuple(), grid[x2][y2].getTuple()); 
 			temp->setType('E');
@@ -310,21 +100,15 @@ public:
 			grid[x1][y1].setLocked(false);
 			grid[x1][y1].setType('E');
 
-			vecinos_bloqueados.erase(vecinos_bloqueados.begin()+ random1);
+			vecinos_bloqueados.erase(vecinos_bloqueados.begin() + random1);
 
 			vecinos_desbloqueados.clear();
-			
-
 
 		}
 
 	}
 
-	Node* getMedio(Tuple<> t1, Tuple<> t2) { // original, adyacente
-
-		//cout << t1.x << ", " << t1.y << endl;
-		//cout << t2.x << ", " << t2.y << endl;
-		
+	Node* getMedio(Tuple<> t1, Tuple<> t2) { // original, adyacente		
 
 		if (t1.x == t2.x) {
 			if (t1.y == t2.y + 2)
@@ -334,12 +118,10 @@ public:
 		} 
 		
 		else if (t1.y == t2.y) {
-			
 			if (t1.x == t2.x + 2)
 				return &grid[t1.x - 1][t1.y];
-			else if (t1.x == t2.x - 2) {
+			else if (t1.x == t2.x - 2) 
 				return &grid[t1.x + 1][t1.y];
-			}
 		}
 		
 	}
@@ -370,48 +152,46 @@ public:
 
 	// setters
 
-	void setWall(Tuple<> t) {
-		grid[t.x][t.y].animation(t, 'W');
-	}
-
 	void setBegin(Tuple<> t) {
 
 		if (grid[t.x][t.y].getType() != 'W') {
 
-			if (start) { // si ya hay un start, se borrará el anterior
+			if (start) { 
 				setEmpty(start_tuple);
-				grid[start_tuple.x][start_tuple.y].setIsStart(false); // el anterior ya no será reconocido como start point
+				grid[start_tuple.x][start_tuple.y].setIsStart(false); 
 			}
-			grid[t.x][t.y].animation(t, 'B');
-			grid[t.x][t.y].setIsStart(true); // ese nodo está setteado como true
+			grid[t.x][t.y].setType('B');
+			grid[t.x][t.y].setIsStart(true); 
 			start_tuple = t;
-			start = true; // ahora sí hay un start
+			start = true; 
 		}
 		
 	}
 
-	void setNumberGrid(int t) {
-		number_grid = t;
-	}
-
 	void setEnd(Tuple<> t) {
-
 		if (grid[t.x][t.y].getType() != 'W') {
 			if (end) {
 				setEmpty(end_tuple);
 				grid[end_tuple.x][end_tuple.y].setIsEnd(false);
 			}
-
-			grid[t.x][t.y].animation(t, 'T');
+			grid[t.x][t.y].setType('T');
 			grid[t.x][t.y].setIsEnd(true);
 			end_tuple = t;
 			end = true;
 		}
 	}
 
-	void setEmpty(Tuple<> t) {
-		grid[t.x][t.y].animation(t, 'E');
+	void setNumberGrid(int t) {
+		number_grid = t;
+	}
 
+	void setEmpty(Tuple<> t) {
+		grid[t.x][t.y].setType('E');
+
+	}
+
+	void setWall(Tuple<> t) {
+		grid[t.x][t.y].setType('W');
 	}
 
 	void setAlgorithm(int i) {
@@ -442,10 +222,6 @@ public:
 
 	double getTime() {
 		return time;
-	}
-
-	Node** get_Grid() {
-		return grid;
 	}
 
 	// limpieza
@@ -525,8 +301,6 @@ public:
 
 	// - - - - -  algorithms  - - - - -
 
-	// dijkstra
-
 	void dijkstra(Menu menu) {
 
 		if (!is_clean) partial_clean(3);
@@ -602,8 +376,6 @@ public:
 
 	}
 
-	// dfs
-
 	void dfs(Menu menu) {
 
 		set_neighbors();
@@ -659,8 +431,6 @@ public:
 		is_clean = false;
 
 	}
-
-	// bfs
 
 	void bfs(Menu menu) {
 
@@ -721,8 +491,6 @@ public:
 
 	}
 
-	// - - - - - - - - - - - - - - - -
-
 	// tiempos
 
 	double dijkstra_time() {
@@ -782,7 +550,6 @@ public:
 
 	}
 
-
 	double dfs_time() {
 
 		if (!is_clean) partial_clean(3);
@@ -829,8 +596,6 @@ public:
 
 
 	}
-
-	// bfs
 
 	double bfs_time() {
 
@@ -941,7 +706,6 @@ public:
 		grid[start_tuple.x][start_tuple.y].setType('B');
 		grid[end_tuple.x][end_tuple.y].setType('T');
 	}
-
 
 	vector<Node*> getUnvisitedNeighbors(Node* current) {
 		vector<Node*> neighbors;
