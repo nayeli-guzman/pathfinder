@@ -61,7 +61,7 @@ public:
                 }
                 else {
                     if (event.type == Event::MouseButtonPressed) {
-                        Tuple current_pos = getTuple();
+                        Tuple<> current_pos = getTuple();
                         if (event.mouseButton.button == Mouse::Left) {
                             if (number_of_map == 1) {
                                 if (selected_alg_1)
@@ -348,7 +348,7 @@ public:
         }
     }
 
-    Tuple getTuple() {
+    Tuple<> getTuple() {
         int node_size = 40;
         if (number_of_map == 1)
             node_size = 32;
@@ -357,6 +357,6 @@ public:
         Vector2i mouse = Mouse::getPosition(window);
         int x = mouse.x / node_size;
         int y = (mouse.y - HEADER_HEIGHT) / node_size;
-        return Tuple(x, y);
+        return Tuple<>(x, y);
     }
 };
