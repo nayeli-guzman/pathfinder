@@ -40,7 +40,13 @@ public:
 		
 		Grid grid(ROWS, COLS, window, 2);
 		Grid small_grid(20, 50, window, 1);
-		Menu menu(HEADER_HEIGHT, NODE_SIZE * COLS, NODE_SIZE * ROWS, window);
+			
+		MenuAbstract* menu = new Menu(HEADER_HEIGHT, NODE_SIZE * COLS, NODE_SIZE * ROWS, window);
+		MenuAbstract* menu_help_window = new HelpWindowMenu(menu, window);
+
+		//menu_help_window->setTexts();
+
+
 
 		while (window.isOpen()) {
 			window.clear(Color::White);
@@ -51,12 +57,12 @@ public:
 
 				if (help_window && event.type == Event::KeyPressed) {
 						help_window = false;
-						menu.activate_help_window(help_window);
+						menu->activate_help_window(help_window);
 				}
 
 				else if (comparison_table && event.type == Event::KeyPressed) {
 						comparison_table = false;
-						menu.activate_comparison_table(comparison_table);
+						menu->activate_comparison_table(comparison_table);
 				}
 
 				else {
@@ -84,7 +90,7 @@ public:
 
 						if (event.key.code == Keyboard::M) {
 							help_window = true;
-							menu.activate_help_window(help_window);
+							menu->activate_help_window(help_window);
 						}
 
 						else if (event.key.code == Keyboard::C) {
@@ -99,16 +105,16 @@ public:
 							if (number_of_map == 1) {
 							
 								if (small_grid.isBegin() == false || small_grid.isEnd() == false) 
-									menu.changeDynamicText(1, 0); // 1: No begin or end
+									menu->changeDynamicText(1, 0); // 1: No begin or end
 								else { 
 									if (event.key.code == Keyboard::Num1)
-										updateAlgorithm(&small_grid, &menu, selected_alg_1, 1);
+										updateAlgorithm(&small_grid, menu, selected_alg_1, 1);
 									
 									else if (event.key.code == Keyboard::Num2)
-										updateAlgorithm(&small_grid, &menu, selected_alg_1, 2);
+										updateAlgorithm(&small_grid, menu, selected_alg_1, 2);
 									
 									else if (event.key.code == Keyboard::Num3) 
-										updateAlgorithm(&small_grid, &menu, selected_alg_1, 3);
+										updateAlgorithm(&small_grid, menu, selected_alg_1, 3);
 									
 									else if (event.key.code == Keyboard::Num4) {
 
@@ -118,21 +124,21 @@ public:
 										Grid temp = small_grid; // se copia cuando solo hay inicio y fin
 
 										thread dijkstra_thread([&]() {Times[0] = temp.dijkstra_time(); });
-										execute_4(&small_grid, &menu, 1, "Dijkstra");
+										execute_4(&small_grid, menu, 1, "Dijkstra");
 										dijkstra_thread.join();
 										small_grid.partial_clean(3);
 
 										thread dfs_thread([&]() {Times[1] = temp.dfs_time(); });
-										execute_4(&small_grid, &menu, 2, "DFS");
+										execute_4(&small_grid, menu, 2, "DFS");
 										dfs_thread.join();
 										small_grid.partial_clean(3);
 
 										thread bfs_thread([&]() {Times[2] = temp.bfs_time(); });
-										execute_4(&small_grid, &menu, 3, "BFS");
+										execute_4(&small_grid, menu, 3, "BFS");
 										bfs_thread.join();
 
 										comparison_table = true;
-										menu.activate_comparison_table(comparison_table);
+										menu->activate_comparison_table(comparison_table);
 										selected_alg_1 = true;
 
 									}
@@ -143,18 +149,18 @@ public:
 							else if (number_of_map == 2) {
 
 								if (grid.isBegin() == false || grid.isEnd() == false)
-									menu.changeDynamicText(1, 0); // 1: No begin or end
+									menu->changeDynamicText(1, 0); // 1: No begin or end
 
 								else { // si el inicio y fin están definidos
 
 									if (event.key.code == Keyboard::Num1) 
-										updateAlgorithm(&grid, &menu, selected_alg_2, 1);
+										updateAlgorithm(&grid, menu, selected_alg_2, 1);
 
 									else if (event.key.code == Keyboard::Num2)
-										updateAlgorithm(&grid, &menu, selected_alg_2, 2);
+										updateAlgorithm(&grid, menu, selected_alg_2, 2);
 
 									else if (event.key.code == Keyboard::Num3)
-										updateAlgorithm(&grid, &menu, selected_alg_2, 3);
+										updateAlgorithm(&grid, menu, selected_alg_2, 3);
 
 									else if (event.key.code == Keyboard::Num4) {
 
@@ -164,21 +170,21 @@ public:
 										Grid temp = grid; // se copia cuando solo hay inicio y fin
 
 										thread dijkstra_thread([&]() {Times[0] = temp.dijkstra_time(); });
-										execute_4(&grid, &menu, 1, "Dijkstra");
+										execute_4(&grid, menu, 1, "Dijkstra");
 										dijkstra_thread.join();
 										grid.partial_clean(3);
 
 										thread dfs_thread([&]() {Times[1] = temp.dfs_time(); });
-										execute_4(&grid, &menu, 2, "DFS");
+										execute_4(&grid, menu, 2, "DFS");
 										dfs_thread.join();
 										grid.partial_clean(3);
 
 										thread bfs_thread([&]() {Times[2] = temp.bfs_time(); });
-										execute_4(&grid, &menu, 3, "BFS");
+										execute_4(&grid, menu, 3, "BFS");
 										bfs_thread.join();
 
 										comparison_table = true;
-										menu.activate_comparison_table(comparison_table);
+										menu->activate_comparison_table(comparison_table);
 										selected_alg_2 = true;
 
 									}
@@ -202,23 +208,23 @@ public:
 											thread dijkstra_thread([&]() {Times[0] = temp.dijkstra_time(); });
 											small_grid.dijkstra(menu);
 											dijkstra_thread.join();
-											execute_1_2_3(&small_grid, &menu, 1, selected_alg_1);
+											execute_1_2_3(&small_grid, menu, 1, selected_alg_1);
 										}
 										else if (small_grid.getAlgorithm() == 2) {
 											thread dfs_thread([&]() {Times[1] = temp.dfs_time(); });
 											small_grid.dfs(menu);
 											dfs_thread.join();
-											execute_1_2_3(&small_grid, &menu, 2, selected_alg_1);
+											execute_1_2_3(&small_grid, menu, 2, selected_alg_1);
 										}
 										else if (small_grid.getAlgorithm() == 3) {
 											thread bfs_thread([&]() {Times[2] = temp.bfs_time(); });
 											small_grid.bfs(menu);
 											bfs_thread.join();
-											execute_1_2_3(&small_grid, &menu, 3, selected_alg_1);
+											execute_1_2_3(&small_grid, menu, 3, selected_alg_1);
 										}
 									}
 								}
-								else menu.changeDynamicText(1, 0);
+								else menu->changeDynamicText(1, 0);
 
 							}
 							else if (number_of_map == 2) {
@@ -232,24 +238,24 @@ public:
 											thread dijkstra_thread([&]() {Times[0] = temp.dijkstra_time(); });
 											grid.dijkstra(menu);
 											dijkstra_thread.join();
-											execute_1_2_3(&grid, &menu, 1, selected_alg_2);
+											execute_1_2_3(&grid, menu, 1, selected_alg_2);
 										}
 										else if (grid.getAlgorithm() == 2) {
 											thread dfs_thread([&]() {Times[1] = temp.dfs_time(); });
 											grid.dfs(menu);
 											dfs_thread.join();
-											execute_1_2_3(&grid, &menu, 2, selected_alg_2);
+											execute_1_2_3(&grid, menu, 2, selected_alg_2);
 										}
 										else if (grid.getAlgorithm() == 3) {
 											thread bfs_thread([&]() {Times[2] = temp.bfs_time(); });
 											grid.bfs(menu);
 											bfs_thread.join();
-											execute_1_2_3(&grid, &menu, 3, selected_alg_2);
+											execute_1_2_3(&grid, menu, 3, selected_alg_2);
 										}
 									}
 									
 								}
-								else menu.changeDynamicText(1, 0);
+								else menu->changeDynamicText(1, 0);
 							
 							}
 
@@ -271,7 +277,9 @@ public:
 			if (number_of_map == 1) small_grid.draw();
 			else if (number_of_map == 2) grid.draw();
 			
-			menu.draw();
+			if (menu->get_activate_help_window())
+				menu_help_window->draw();
+			else menu->draw();
 
 		}	
 
@@ -312,7 +320,7 @@ public:
 		selected_algorithm = false;
 	}
 
-	void updateAlgorithm(Grid* grid, Menu* menu, bool &selected_algorithm, int i) {
+	void updateAlgorithm(Grid* grid, MenuAbstract* menu, bool &selected_algorithm, int i) {
 		if (selected_algorithm) grid->partial_clean(3); // no borra inicio ni fin
 		selected_algorithm = false;
 		menu->updateSelector(i);
@@ -320,18 +328,18 @@ public:
 		grid->setAlgorithm(i);
 	}
 
-	void execute_4(Grid* grid, Menu* menu, int i, string algorithm) {
+	void execute_4(Grid* grid, MenuAbstract* menu, int i, string algorithm) {
 		menu->updateSelector(i);
 		menu->changeDynamicText(i + 1, 0);
 		grid->setAlgorithm(i);
-		if (i == 1) grid->dijkstra(*menu);
-		else if (i == 2) grid->dfs(*menu);
-		else if (i == 3) grid->bfs(*menu);
+		if (i == 1) grid->dijkstra(menu);
+		else if (i == 2) grid->dfs(menu);
+		else if (i == 3) grid->bfs(menu);
 		menu->changeDynamicText(i+4, Times[i-1]);
 		menu->append(algorithm, Times[i - 1]);
 	}
 	
-	void execute_1_2_3(Grid* grid, Menu* menu, int i, bool &selected_algorithm) {
+	void execute_1_2_3(Grid* grid, MenuAbstract* menu, int i, bool &selected_algorithm) {
 		menu->changeDynamicText(i + 4, Times[i - 1]);
 		selected_algorithm = true;
 	}
