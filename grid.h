@@ -301,7 +301,7 @@ public:
 
 	// - - - - -  algorithms  - - - - -
 
-	void dijkstra(Menu menu) {
+	void dijkstra(MenuAbstract* menu) {
 
 		if (!is_clean) partial_clean(3);
 
@@ -321,7 +321,7 @@ public:
 			if (temp != start_tuple && temp != end_tuple) {
 				grid[temp.x][temp.y].setType('X');
 				draw();
-				menu.draw();
+				menu->draw();
 				sleep(sf::milliseconds(0.1));
 			}
 
@@ -339,7 +339,7 @@ public:
 					if (p != start_tuple && p != end_tuple) {
 						grid[p.x][p.y].setType('P');
 						draw();
-						menu.draw();
+						menu->draw();
 						sleep(sf::milliseconds(0.1));
 					}
 
@@ -361,7 +361,7 @@ public:
 
 							grid[t_n.x][t_n.y].setType('Q');
 							draw();
-							menu.draw();
+							menu->draw();
 							sleep(sf::milliseconds(0.1));
 						}
 						
@@ -376,7 +376,7 @@ public:
 
 	}
 
-	void dfs(Menu menu) {
+	void dfs(MenuAbstract* menu) {
 
 		set_neighbors();
 
@@ -396,7 +396,7 @@ public:
 					if (p != start_tuple && p != end_tuple) {
 						grid[p.x][p.y].setType('P');
 						draw();
-						menu.draw();
+						menu->draw();
 						sleep(sf::milliseconds(0.1));
 					}
 
@@ -408,7 +408,7 @@ public:
 			if (current_tuple != start_tuple && current_tuple != end_tuple) {
 				grid[current_tuple.x][current_tuple.y].setType('X');
 				draw(); // Dibuja el estado actual
-				menu.draw();
+				menu->draw();
 				sleep(sf::milliseconds(0.1));
 			}
 
@@ -421,7 +421,7 @@ public:
 					if (neighbor != start_tuple && neighbor != end_tuple) {
 						grid[neighbor.x][neighbor.y].setType('Q'); // Establecer tipo como 'Q'
 						draw();
-						menu.draw();
+						menu->draw();
 						sleep(sf::milliseconds(0.1));
 					}
 				}
@@ -432,7 +432,7 @@ public:
 
 	}
 
-	void bfs(Menu menu) {
+	void bfs(MenuAbstract* menu) {
 
 		// Configurar vecinos
 		set_neighbors();
@@ -456,7 +456,7 @@ public:
 					if (p != start_tuple && p != end_tuple) {
 						grid[p.x][p.y].setType('P');
 						draw();
-						menu.draw();
+						menu->draw();
 						sleep(sf::milliseconds(0.1));
 					}
 
@@ -468,7 +468,7 @@ public:
 			if (current_tuple != start_tuple && current_tuple != end_tuple) {
 				grid[current_tuple.x][current_tuple.y].setType('X');
 				draw(); // Dibuja el estado actual
-				menu.draw();
+				menu->draw();
 				sleep(sf::milliseconds(3));
 			}
 
@@ -481,7 +481,7 @@ public:
 					if (neighbor != start_tuple && neighbor != end_tuple) {
 						grid[neighbor.x][neighbor.y].setType('Q'); // Establecer tipo como 'Q'
 						draw();
-						menu.draw();
+						menu->draw();
 						sleep(sf::milliseconds(0.1));
 					}
 				}
