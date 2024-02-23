@@ -17,43 +17,48 @@ class Grid {
 private:
 	RenderWindow& window;
 	Node** grid;
-	Tuple<> start_tuple, end_tuple ;
+	Node** non_selected_grid;
+	Tuple<> start_tuple, end_tuple;
 	bool start = false, end = false
 		, is_clean = true; // no cuenta inicio ni fin
 	int rows, cols
 		, number_grid = 2
 		, number_of_algorithm = 0;
 	double time = 0;
-	
+
 public:
 
 
 	Grid(int r, int c, RenderWindow& w, int n) : rows(r), cols(c), window(w), number_grid(n) { // 17, 40
 
 		grid = new Node * [cols];
+		non_selected_grid = new Node * [cols];
 
 		for (int x = 0; x < cols; x++) {
 			grid[x] = new Node[rows];
+			non_selected_grid[x] = new Node[rows];
 			for (int y = 0; y < rows; y++) {
 				grid[x][y] = Node(Tuple<>(x, y), 'W', number_grid);
+				non_selected_grid[x][y] = Node(Tuple<>(x, y), 'W', number_grid);
 				// CAMBIAR A EMPTY SI NO SE VA A EJECUTAR PRIMS_ALGORITHM
 				grid[x][y].setCols(cols);
 				grid[x][y].setRows(rows);
-			}
+				non_selected_grid[x][y].setCols(cols);
+				non_selected_grid[x][y].setRows(rows);
+				non_selected_grid[x][y].setType('E');
 
+			}
 		}
 
+
 		prims_algorithm();
+		generateMazeDFS();
 
-		//generateMazeDFS();
 
-		//maze();
-		
-		
 	}
 
 	Grid(const Grid& otro) : rows(otro.rows), cols(otro.cols), window(otro.window)
-							, start_tuple(otro.start_tuple), end_tuple(otro.end_tuple){
+		, start_tuple(otro.start_tuple), end_tuple(otro.end_tuple) {
 
 		grid = new Node * [cols];
 
@@ -61,9 +66,15 @@ public:
 			grid[x] = new Node[rows];
 			for (int y = 0; y < rows; y++)
 				grid[x][y] = otro.grid[x][y];
-		
+
 		}
 
+	}
+
+	void changeSelectedGrid() {
+		auto temp = grid;
+		grid = non_selected_grid;
+		non_selected_grid = temp;
 	}
 
 	void prims_algorithm() {
@@ -71,28 +82,29 @@ public:
 		vector<Node> vecinos_bloqueados;
 		vector<Node> vecinos_desbloqueados;
 
+
 		int x_r = rand() % cols;
 		int y_r = rand() % rows;
 
 		grid[x_r][y_r].setType('E');
 		grid[x_r][y_r].setLocked(false); // ya no está bloqueada
-		
+
 
 		get_vecinos_bloqueados(x_r, y_r, vecinos_bloqueados); // VECINOS BLOQ DE INICIO RANDOM
 
 		while (!vecinos_bloqueados.empty()) {
-		
+
 			int random1 = rand() % vecinos_bloqueados.size();
 			int x1 = vecinos_bloqueados[random1].getTuple().x;
 			int y1 = vecinos_bloqueados[random1].getTuple().y; // ID VECINO BLOQ RANDOM
 
 			get_vecinos_desbloqueados(x1, y1, vecinos_desbloqueados);
-			
+
 			int random2 = rand() % vecinos_desbloqueados.size();
 			int x2 = vecinos_desbloqueados[random2].getTuple().x;
 			int y2 = vecinos_desbloqueados[random2].getTuple().y; // ID VECINO DESBLOQ RANDOM
 
-			Node* temp = getMedio(grid[x1][y1].getTuple(), grid[x2][y2].getTuple()); 
+			Node* temp = getMedio(grid[x1][y1].getTuple(), grid[x2][y2].getTuple());
 			temp->setType('E');
 
 			get_vecinos_bloqueados(x1, y1, vecinos_bloqueados);
@@ -115,23 +127,23 @@ public:
 				return &grid[t1.x][t1.y - 1];
 			else if (t1.y == t2.y - 2)
 				return &grid[t1.x][t1.y + 1];
-		} 
-		
+		}
+
 		else if (t1.y == t2.y) {
 			if (t1.x == t2.x + 2)
 				return &grid[t1.x - 1][t1.y];
-			else if (t1.x == t2.x - 2) 
+			else if (t1.x == t2.x - 2)
 				return &grid[t1.x + 1][t1.y];
 		}
-		
+
 	}
 
-	void get_vecinos_bloqueados(int x, int y, vector<Node> &bloq) {
+	void get_vecinos_bloqueados(int x, int y, vector<Node>& bloq) {
 
 		if (x > 1 && grid[x - 2][y].getLocked() == true) bloq.push_back(grid[x - 2][y]);
 		if (y > 1 && grid[x][y - 2].getLocked() == true) bloq.push_back(grid[x][y - 2]);
-		if (x < cols-2 && grid[x + 2][y].getLocked() == true) bloq.push_back(grid[x + 2][y]);
-		if (y < rows-2 && grid[x][y + 2].getLocked() == true) bloq.push_back(grid[x][y + 2]);
+		if (x < cols - 2 && grid[x + 2][y].getLocked() == true) bloq.push_back(grid[x + 2][y]);
+		if (y < rows - 2 && grid[x][y + 2].getLocked() == true) bloq.push_back(grid[x][y + 2]);
 
 	}
 
@@ -156,16 +168,16 @@ public:
 
 		if (grid[t.x][t.y].getType() != 'W') {
 
-			if (start) { 
+			if (start) {
 				setEmpty(start_tuple);
-				grid[start_tuple.x][start_tuple.y].setIsStart(false); 
+				grid[start_tuple.x][start_tuple.y].setIsStart(false);
 			}
 			grid[t.x][t.y].setType('B');
-			grid[t.x][t.y].setIsStart(true); 
+			grid[t.x][t.y].setIsStart(true);
 			start_tuple = t;
-			start = true; 
+			start = true;
 		}
-		
+
 	}
 
 	void setEnd(Tuple<> t) {
@@ -257,11 +269,11 @@ public:
 		end_tuple.x = -1;
 		end_tuple.y = -1;
 
-		
+
 
 	}
 
-	void partial_clean(int i) { 
+	void partial_clean(int i) {
 
 		for (int x = 0; x < cols; x++)
 			for (int y = 0; y < rows; y++)
@@ -325,7 +337,7 @@ public:
 				sleep(sf::milliseconds(0.1));
 			}
 
-			queued_nodes.front().setVisited(true); 
+			queued_nodes.front().setVisited(true);
 			queued_nodes.pop();
 
 			if (temp == end_tuple) {
@@ -335,7 +347,7 @@ public:
 				Tuple<> p = grid[temp.x][temp.y].getPrior();
 
 				while ((p.x != start_tuple.x) || (p.y != start_tuple.y)) {
-					
+
 					if (p != start_tuple && p != end_tuple) {
 						grid[p.x][p.y].setType('P');
 						draw();
@@ -353,7 +365,7 @@ public:
 				for (auto t_n : grid[temp.x][temp.y].get_n()) { // iterando en los vecinos del nodo
 					if (!grid[t_n.x][t_n.y].getQueued()) { // para verificar si ese vecino ya ha sido visitado
 						grid[t_n.x][t_n.y].setQueued(true);
-						
+
 						grid[t_n.x][t_n.y].setPrior(temp);
 						queued_nodes.push(grid[t_n.x][t_n.y]);
 
@@ -364,8 +376,8 @@ public:
 							menu->draw();
 							sleep(sf::milliseconds(0.1));
 						}
-						
-						
+
+
 					}
 				}
 			}
@@ -513,7 +525,7 @@ public:
 
 			Tuple<> temp = queued_nodes.front().getTuple();
 
-			queued_nodes.front().setVisited(true); 
+			queued_nodes.front().setVisited(true);
 			queued_nodes.pop();
 
 			if (temp == end_tuple) {
@@ -524,17 +536,17 @@ public:
 
 				while ((p.x != start_tuple.x) || (p.y != start_tuple.y))
 					p = grid[p.x][p.y].getPrior();
-				
+
 			}
 			else {
 
-				for (auto t_n : grid[temp.x][temp.y].get_n())  
-					if (!grid[t_n.x][t_n.y].getQueued()) { 
+				for (auto t_n : grid[temp.x][temp.y].get_n())
+					if (!grid[t_n.x][t_n.y].getQueued()) {
 						grid[t_n.x][t_n.y].setQueued(true);
 						grid[t_n.x][t_n.y].setPrior(temp);
 						queued_nodes.push(grid[t_n.x][t_n.y]);
 					}
-		
+
 			}
 		}
 
@@ -656,7 +668,7 @@ public:
 
 
 	}
-	
+
 	void generateMazeDFS() {
 		// Restablecer el laberinto
 
@@ -666,8 +678,8 @@ public:
 		// Elegir una posición de inicio aleatoria
 		int startX = rand() % cols;
 		int startY = rand() % rows;
-		grid[startX][startY].setType('W'); // Marcar el nodo inicial como pared
-		pila.push(&grid[startX][startY]); // Empujar el nodo inicial a la pila
+		non_selected_grid[startX][startY].setType('W'); // Marcar el nodo inicial como pared
+		pila.push(&non_selected_grid[startX][startY]); // Empujar el nodo inicial a la pila
 
 		// DFS para generar el laberinto
 		while (!pila.empty()) {
@@ -684,7 +696,7 @@ public:
 				vecino->setType('W'); // Marcar el vecino como pared
 				int x = actual->getTuple().x + (vecino->getTuple().x - actual->getTuple().x) / 2;
 				int y = actual->getTuple().y + (vecino->getTuple().y - actual->getTuple().y) / 2;
-				grid[x][y].setType('W'); // Marcar el espacio entre el nodo actual y el vecino como pared
+				non_selected_grid[x][y].setType('W'); // Marcar el espacio entre el nodo actual y el vecino como pared
 				pila.push(vecino); // Empujar el vecino a la pila
 				pila.push(actual); // Empujar el nodo actual nuevamente para continuar la exploración
 			}
@@ -715,10 +727,10 @@ public:
 		int y = pos.y;
 
 		// Verificar vecinos arriba, abajo, izquierda y derecha
-		if (x > 1 && grid[x - 2][y].getType() == 'E') neighbors.push_back(&grid[x - 2][y]);
-		if (x < cols - 2 && grid[x + 2][y].getType() == 'E') neighbors.push_back(&grid[x + 2][y]);
-		if (y > 1 && grid[x][y - 2].getType() == 'E') neighbors.push_back(&grid[x][y - 2]);
-		if (y < rows - 2 && grid[x][y + 2].getType() == 'E') neighbors.push_back(&grid[x][y + 2]);
+		if (x > 1 && non_selected_grid[x - 2][y].getType() == 'E') neighbors.push_back(&non_selected_grid[x - 2][y]);
+		if (x < cols - 2 && non_selected_grid[x + 2][y].getType() == 'E') neighbors.push_back(&non_selected_grid[x + 2][y]);
+		if (y > 1 && non_selected_grid[x][y - 2].getType() == 'E') neighbors.push_back(&non_selected_grid[x][y - 2]);
+		if (y < rows - 2 && non_selected_grid[x][y + 2].getType() == 'E') neighbors.push_back(&non_selected_grid[x][y + 2]);
 
 		return neighbors;
 	}
