@@ -9,37 +9,44 @@
 using namespace std;
 using namespace sf;
 
-class Menu {
+class MenuAbstract {
+protected:
+	Font font_1, font_2, font_3;
+public:
+
+	MenuAbstract () {
+		font_1.loadFromFile("sprites/font_headers.TTF");
+		font_2.loadFromFile("sprites/font_body.ttf");
+		font_3.loadFromFile("sprites/font_normal.ttf");
+	}
+
+	virtual void changeDynamicText(int, double ) = 0;
+	virtual void updateSelector(int) = 0;
+	virtual void activate_help_window(bool c) = 0;
+	virtual void activate_comparison_table(bool c) = 0;
+	virtual void draw() = 0;
+	virtual void append(string, double ) = 0;
+	virtual bool get_activate_help_window() = 0;
+};
+
+class Menu : public MenuAbstract {
 private:
+
 	int height, width, bottom;
 	RenderWindow& window;
-	RectangleShape b_menu, b_algorithms, b_selector, b_help, b_table;
-	Font font_1, font_2, font_3;
-	Text text_1, text_2, text_3, text_4, text_5, text_6, text_7, text_8
-		, text_9
-		;
+	RectangleShape b_menu, b_algorithms, b_selector, b_table;
+	Text text_1, text_2, text_3, text_9;
 	string t1 = "Bienvenido"
 		, t2 = "Presione 'M' para abrir el menu"
-		, t3 = "Informacion"
-		, t4 = "Presione las siguientes teclas de acuerdo al \n\n          algoritmo que quiera ejecutar"
-		, t5 = ". . .  seleccione un algoritmo  . . ." // dynamic text
-		, t6 = "Para ejecutar el algoritmo seleccionado, usted" 
-				"\n\n          debe presionar 'ESPACIO'."
-				"\n\n\n\nAntes de esto el inicio y fin deben definirse"
-		, t7 = "[click] \t Inicio"
-				"\n\n[anticlick]\t Fin"
-		, t8 = "Para reiniciar el mapa y ejecutar otro algoritmo, "
-				"\n\n	debe presionar 'C' y repetir el proceso\n\n				 de seleccion"
+		, t3 = ". . .  seleccione un algoritmo  . . ." // dynamic text
 		, t9 = "Comparacion"
-		
 		;
 
 	map<string, double> times;
 
 	vector<string> times_str;
-	vector<string> help_alg{ "[1]\t Dijkstra", "[2]\t BFS", "[3]\t DFS" };
 
-	vector<Text> alg_txt, help_txt, times_txt;
+	vector<Text> alg_txt, times_txt;
 	vector<string> algorithms{ "Dijkstra", "DFS", "BFS" };
 	bool help_w = false, comparison_t = false;
 
@@ -48,14 +55,8 @@ public:
 	Menu(int h, int w, int b, RenderWindow& wd)
 		: height(h), width(w), bottom(b), window(wd) {
 
-		// setting fonts for every str
-		font_1.loadFromFile("sprites/font_headers.TTF");
-		font_2.loadFromFile("sprites/font_body.ttf");
-		font_3.loadFromFile("sprites/font_normal.ttf");
-
 		setBackgrounds();
 		setTexts();
-		setTextHelpWindow();
 		//setTextComparison();
 
 	}
@@ -77,11 +78,6 @@ public:
 		b_selector = RectangleShape(Vector2f(NODE_SIZE * 6, 40));
 		b_selector.setFillColor(Color(175, 80, 0, 255));
 		b_selector.setPosition(width / 2 - 3 * NODE_SIZE, 145);
-
-		// background of help window
-		b_help = RectangleShape(Vector2f(NODE_SIZE * 21, NODE_SIZE * 15));
-		b_help.setFillColor(Color(55, 55, 55, 255));
-		b_help.setPosition(width / 2 - 10.5 * NODE_SIZE, 150);
 
 		// background of table of positions
 		b_table = RectangleShape(Vector2f(NODE_SIZE * 21, NODE_SIZE * 15));
@@ -120,51 +116,10 @@ public:
 
 		// dynamic text / 
 
-		text_5.setFont(font_3);
-		text_5.setString(t5);
-		text_5.setCharacterSize(23);
-		text_5.setPosition(width / 2 + 2 * NODE_SIZE, NODE_SIZE * 1.5);
-
-		
-
-	}
-
-	void setTextHelpWindow() {
-
-		// content of help window
-		text_3.setFont(font_1);
+		text_3.setFont(font_3);
 		text_3.setString(t3);
-		text_3.setCharacterSize(30);
-		text_3.setPosition(width / 2 - 3.25 * NODE_SIZE, 150 + 1.5 * NODE_SIZE);
-
-		text_4.setFont(font_2);
-		text_4.setString(t4);
-		text_4.setCharacterSize(15);
-		text_4.setPosition(width / 2 - 8.5 * NODE_SIZE, 150 + 3 * NODE_SIZE);
-
-		help_txt.resize(3);
-
-		for (int i = 0, j = 0; i < alg_txt.size(); i++, j = j + 1.5) {
-			help_txt[i].setFont(font_2);
-			help_txt[i].setString(help_alg[i]);
-			help_txt[i].setCharacterSize(15);
-			help_txt[i].setPosition(width / 2 - 3 * NODE_SIZE, 150 + (5 + j) * NODE_SIZE);
-		}
-
-		text_6.setFont(font_2);
-		text_6.setString(t6);
-		text_6.setCharacterSize(15);
-		text_6.setPosition(width / 2 - 8.75 * NODE_SIZE, 150 + 8.5 * NODE_SIZE);
-
-		text_7.setFont(font_2);
-		text_7.setString(t7);
-		text_7.setCharacterSize(15);
-		text_7.setPosition(width / 2 - 4.5 * NODE_SIZE, 150 + 11 * NODE_SIZE);
-
-		text_8.setFont(font_2);
-		text_8.setString(t8);
-		text_8.setCharacterSize(15);
-		text_8.setPosition(width / 2 - 8.75 * NODE_SIZE, 150 + 12.7 * NODE_SIZE);
+		text_3.setCharacterSize(23);
+		text_3.setPosition(width / 2 + 2 * NODE_SIZE, NODE_SIZE * 1.5);
 
 	}
 
@@ -193,39 +148,39 @@ public:
 
 	}
 
-	void changeDynamicText(int index, double t) {
+	void changeDynamicText(int index, double t) override {
 
 		switch (index){
 			case 1:
-				t5 = "seleccione un inicio y/o fin";
+				t3 = "seleccione un inicio y/o fin";
 				break;
 			case 2:
-				t5 = "ejecutando Dijkstra";
+				t3 = "ejecutando Dijkstra";
 				break;
 			case 3:
-				t5 = "ejecutando DFS";
+				t3 = "ejecutando DFS";
 				break;
 			case 4:
-				t5 = "ejecutando BFS";
+				t3 = "ejecutando BFS";
 				break;
 			case 5:
-				t5 = "Dijkstra tomó " + to_string(t) + " ms";
+				t3 = "Dijkstra tomó " + to_string(t) + " ms";
 				break;
 			case 6:
-				t5 = "DFS tomó " + to_string(t) + " ms";
+				t3 = "DFS tomó " + to_string(t) + " ms";
 				break;
 			case 7:
-				t5 = "BFS tomó " + to_string(t) + " ms";
+				t3 = "BFS tomó " + to_string(t) + " ms";
 				break;
 			default:
 				break;
 		}
 
-		text_5.setString(t5);
+		text_3.setString(t3);
 
 	}
 
-	void updateSelector(int i) {
+	void updateSelector(int i) override {
 		switch (i) {
 		case 1:
 			b_selector.setPosition(width / 2 - 14 * NODE_SIZE, 145);
@@ -241,15 +196,15 @@ public:
 		}
 	}
 
-	void activate_help_window(bool c) {
+	void activate_help_window(bool c) override {
 		help_w = c;
 	}
 
-	void activate_comparison_table(bool c) {
+	void activate_comparison_table (bool c) override {
 		comparison_t = c;
 	}
 
-	void draw() {
+	void draw() override {
 
 		window.draw(b_menu);
 		window.draw(b_algorithms);
@@ -257,19 +212,9 @@ public:
 
 		window.draw(text_1);
 		window.draw(text_2);
-		window.draw(text_5);
+		window.draw(text_3);
 
 		for_each(alg_txt.begin(), alg_txt.end(), [=](Text x) {window.draw(x); });
-
-		if (help_w) {
-			window.draw(b_help);
-			window.draw(text_3);
-			window.draw(text_4);
-			for_each(help_txt.begin(), help_txt.end(), [=](Text x) {window.draw(x); });
-			window.draw(text_6);
-			window.draw(text_7);
-			window.draw(text_8);
-		}
 
 		if (comparison_t) {
 			setTextComparison();
@@ -282,9 +227,121 @@ public:
 
 	}
 
-	void append(string algoritmo, double time) {
+	void append (string algoritmo, double time) override {
 		times[algoritmo] = time;
 	}
+
+	bool get_activate_help_window() {
+		return help_w;
+	}
+
+};
+
+class Decorator : public MenuAbstract {
+protected:
+	MenuAbstract* menu;
+public:
+
+	Decorator(MenuAbstract* menu) : menu(menu) {}
+
+	void changeDynamicText(int, double) override {};
+	void updateSelector(int) override {};
+	void activate_help_window(bool c) override {};
+	void activate_comparison_table(bool c) override {};
+	void draw() override {
+		menu->draw();
+	};
+	void append(string, double) override {};
+};
+
+class HelpWindowMenu : public Decorator {
+
+	int height = HEADER_HEIGHT, width = NODE_SIZE*COLS, bottom;
+	RenderWindow& window;
+	RectangleShape b_help;
+	
+	Text text_1, text_2, text_3, text_4, text_5, text_9;
+	string t1 = "Informacion"
+		, t2 = "Presione las siguientes teclas de acuerdo al \n\n          algoritmo que quiera ejecutar"
+		, t3 = "Para ejecutar el algoritmo seleccionado, usted"
+		"\n\n          debe presionar 'ESPACIO'."
+		"\n\n\n\nAntes de esto el inicio y fin deben definirse"
+		, t4 = "[click] \t Inicio"
+		"\n\n[anticlick]\t Fin"
+		, t5 = "Para reiniciar el mapa y ejecutar otro algoritmo, "
+		"\n\n	debe presionar 'C' y repetir el proceso\n\n				 de seleccion"
+		;
+	vector<string> help_alg{ "[1]\t Dijkstra", "[2]\t BFS", "[3]\t DFS" };
+	vector<Text> help_txt;
+public:
+
+	HelpWindowMenu(MenuAbstract* menu, RenderWindow& wd) : Decorator(menu), window(wd) {
+
+		setBackgrounds();
+		setTexts();
+	}
+
+	void setBackgrounds()  {
+		b_help = RectangleShape(Vector2f(NODE_SIZE * 21, NODE_SIZE * 15));
+		b_help.setFillColor(Color(55, 55, 55, 255));
+		b_help.setPosition(width / 2 - 10.5 * NODE_SIZE, 150);
+	};
+
+	void setTexts() {
+
+		text_1.setFont(font_1);
+		text_1.setString(t1);
+		text_1.setCharacterSize(30);
+		text_1.setPosition(width / 2 - 3.25 * NODE_SIZE, 150 + 1.5 * NODE_SIZE);
+
+		text_2.setFont(font_2);
+		text_2.setString(t2);
+		text_2.setCharacterSize(15);
+		text_2.setPosition(width / 2 - 8.5 * NODE_SIZE, 150 + 3 * NODE_SIZE);
+
+		help_txt.resize(3);
+
+		for (int i = 0, j = 0; i < help_alg.size(); i++, j = j + 1.5) {
+			help_txt[i].setFont(font_2);
+			help_txt[i].setString(help_alg[i]);
+			help_txt[i].setCharacterSize(15);
+			help_txt[i].setPosition(width / 2 - 3 * NODE_SIZE, 150 + (5 + j) * NODE_SIZE);
+		}
+
+		text_3.setFont(font_2);
+		text_3.setString(t3);
+		text_3.setCharacterSize(15);
+		text_3.setPosition(width / 2 - 8.75 * NODE_SIZE, 150 + 8.5 * NODE_SIZE);
+
+		text_4.setFont(font_2);
+		text_4.setString(t4);
+		text_4.setCharacterSize(15);
+		text_4.setPosition(width / 2 - 4.5 * NODE_SIZE, 150 + 11 * NODE_SIZE);
+
+		text_5.setFont(font_2);
+		text_5.setString(t5);
+		text_5.setCharacterSize(15);
+		text_5.setPosition(width / 2 - 8.75 * NODE_SIZE, 150 + 12.7 * NODE_SIZE);
+
+	}
+
+	void draw() override {
+
+		Decorator::draw();
+
+		window.draw(b_help);
+		window.draw(text_1);
+		window.draw(text_2);
+		for_each(help_txt.begin(), help_txt.end(), [=](Text x) {window.draw(x); });
+		window.draw(text_3);
+		window.draw(text_4);
+		window.draw(text_5);
+		window.display();
+
+	};
+	
+	bool get_activate_help_window() override { return 3; }
+
 
 };
 
