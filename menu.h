@@ -14,18 +14,18 @@ protected:
 	Font font_1, font_2, font_3;
 public:
 
-	MenuAbstract () {
+	MenuAbstract() {
 		font_1.loadFromFile("sprites/font_headers.TTF");
 		font_2.loadFromFile("sprites/font_body.ttf");
 		font_3.loadFromFile("sprites/font_normal.ttf");
 	}
 
-	virtual void changeDynamicText(int, double ) = 0;
+	virtual void changeDynamicText(int, double) = 0;
 	virtual void updateSelector(int) = 0;
 	virtual void activate_help_window(bool c) = 0;
 	virtual void activate_comparison_table(bool c) = 0;
 	virtual void draw() = 0;
-	virtual void append(string, double ) = 0;
+	virtual void append(string, double) = 0;
 	virtual bool get_activate_help_window() = 0;
 };
 
@@ -150,30 +150,30 @@ public:
 
 	void changeDynamicText(int index, double t) override {
 
-		switch (index){
-			case 1:
-				t3 = "seleccione un inicio y/o fin";
-				break;
-			case 2:
-				t3 = "ejecutando Dijkstra";
-				break;
-			case 3:
-				t3 = "ejecutando DFS";
-				break;
-			case 4:
-				t3 = "ejecutando BFS";
-				break;
-			case 5:
-				t3 = "Dijkstra tomó " + to_string(t) + " ms";
-				break;
-			case 6:
-				t3 = "DFS tomó " + to_string(t) + " ms";
-				break;
-			case 7:
-				t3 = "BFS tomó " + to_string(t) + " ms";
-				break;
-			default:
-				break;
+		switch (index) {
+		case 1:
+			t3 = "seleccione un inicio y/o fin";
+			break;
+		case 2:
+			t3 = "ejecutando Dijkstra";
+			break;
+		case 3:
+			t3 = "ejecutando DFS";
+			break;
+		case 4:
+			t3 = "ejecutando BFS";
+			break;
+		case 5:
+			t3 = "Dijkstra tomó " + to_string(t) + " ms";
+			break;
+		case 6:
+			t3 = "DFS tomó " + to_string(t) + " ms";
+			break;
+		case 7:
+			t3 = "BFS tomó " + to_string(t) + " ms";
+			break;
+		default:
+			break;
 		}
 
 		text_3.setString(t3);
@@ -200,7 +200,7 @@ public:
 		help_w = c;
 	}
 
-	void activate_comparison_table (bool c) override {
+	void activate_comparison_table(bool c) override {
 		comparison_t = c;
 	}
 
@@ -227,7 +227,7 @@ public:
 
 	}
 
-	void append (string algoritmo, double time) override {
+	void append(string algoritmo, double time) override {
 		times[algoritmo] = time;
 	}
 
@@ -256,10 +256,10 @@ public:
 
 class HelpWindowMenu : public Decorator {
 
-	int height = HEADER_HEIGHT, width = NODE_SIZE*COLS, bottom;
+	int height = HEADER_HEIGHT, width = NODE_SIZE * COLS, bottom;
 	RenderWindow& window;
 	RectangleShape b_help;
-	
+
 	Text text_1, text_2, text_3, text_4, text_5, text_9;
 	string t1 = "Informacion"
 		, t2 = "Presione las siguientes teclas de acuerdo al \n\n          algoritmo que quiera ejecutar"
@@ -281,7 +281,7 @@ public:
 		setTexts();
 	}
 
-	void setBackgrounds()  {
+	void setBackgrounds() {
 		b_help = RectangleShape(Vector2f(NODE_SIZE * 21, NODE_SIZE * 15));
 		b_help.setFillColor(Color(55, 55, 55, 255));
 		b_help.setPosition(width / 2 - 10.5 * NODE_SIZE, 150);
@@ -339,7 +339,7 @@ public:
 		window.display();
 
 	};
-	
+
 	bool get_activate_help_window() override { return 3; }
 
 
