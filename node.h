@@ -191,6 +191,7 @@
 
 		
 			w.draw(*square);
+			
 		
 		}
 
@@ -214,6 +215,8 @@
 			}
 
 		}
+
+
 
 		void total_clean() {
 			if (dijkstra) {
