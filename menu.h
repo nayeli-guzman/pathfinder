@@ -341,7 +341,4 @@ public:
 	};
 
 	bool get_activate_help_window() override { return 3; }
-
-
 };
-
